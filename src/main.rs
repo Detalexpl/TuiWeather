@@ -34,6 +34,7 @@ async  fn main()-> Result<(),reqwest::Error> {
         .await?;
     dbg!("{:#?}", weather);
 
-    //test
+    //test2
+
     Ok(())
 }
