@@ -19,9 +19,6 @@ pub async  fn downloading_data(path:PathBuf) -> Result<(),String> {
     let mut out = File::create(path.join("cities.csv")).map_err(|e| e.to_string())?;
     out.write_all(reqs.as_bytes()).map_err(|e| e.to_string())?;
 
-
-
-
     Ok(())
 }
 

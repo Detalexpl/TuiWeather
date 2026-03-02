@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     let url = get_url(location).await?;
     let weather = get_weather(url).await?;
-    //dbg!(weather);
+    dbg!(weather);
 
 
     Ok(())
