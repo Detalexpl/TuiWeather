@@ -4,6 +4,7 @@ version = "0.1.4"
 edition = "2024"
 license = "MIT"
 description = "Simple Tui app for showing weather"
+authors = ["Detalex<frazeb09@gmail.com>"]
 repository = "https://github.com/Detalexpl/TuiWeather"
 
 [dependencies]
