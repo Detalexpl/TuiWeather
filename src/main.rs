@@ -6,6 +6,8 @@ use std::io;
 pub mod downloading;
 pub mod getting_location;
 pub mod getting_weather;
+mod app;
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -33,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             std::process::exit(1);
         }
     };
-    let location = match get_location(path,stdin.trim()) {
+    let location = match get_location(&path,stdin.trim()) {
         Ok(location) => match location {
             Some(location) => location,
             None => {
@@ -54,3 +56,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
