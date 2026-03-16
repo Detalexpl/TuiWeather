@@ -1,59 +1,34 @@
-use crate::downloading::*;
-use crate::getting_location::*;
-use crate::getting_weather::{get_url, get_weather};
-use std::path::Path;
-use std::io;
+use crate::app::AppState;
+use crossterm::event::EnableMouseCapture;
+use crossterm::execute;
+use crossterm::terminal::{EnterAlternateScreen, enable_raw_mode};
+use ratatui::Terminal;
+use ratatui::backend::CrosstermBackend;
+use std::io::stdout;
+mod app;
 pub mod downloading;
 pub mod getting_location;
 pub mod getting_weather;
-mod app;
-
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut stdin =  String::new();
-    io::stdin().read_line(&mut stdin)?;
-
-
-
-    let path = getting_path();
-    match path {
-        Some(path) => {
-            if !Path::new(&path).exists() {
-                downloading_data(path).await.expect("TODO: panic message");
-            };
-        }
-        None => {
-            eprint!("invalid path");
-            std::process::exit(1);
-        }
+async fn main() {
+    if let Err(_) = enable_raw_mode() {
+        todo!("Add error in enabling raw mode.");
     }
-    let path = match getting_path() {
-        Some(path) => path.join("cities.csv"),
-        None => {
-            eprint!("unable to get path");
-            std::process::exit(1);
-        }
-    };
-    let location = match get_location(&path,stdin.trim()) {
-        Ok(location) => match location {
-            Some(location) => location,
-            None => {
-                eprint!("unable to get location");
-                std::process::exit(1);
-            }
-        },
-        Err(_) => {
-            eprint!("unable to get path");
-            std::process::exit(1);
-
-        }
-    };
-
-    let url = get_url(location).await?;
-    let weather = get_weather(url).await?;
-    dbg!(weather);
-
-    Ok(())
+    if let Err(_) = execute!(stdout(), EnterAlternateScreen, EnableMouseCapture) {
+        todo!("error with execute")
+    }
+    let mut app: AppState;
+    if let Ok(app_state) = AppState::new() {
+        app = app_state
+    } else {
+        todo!("Error retrieving app state");
+    }
+    let backend = CrosstermBackend::new(stdout());
+    let mut terminal;
+    if let Ok(terminal_sec) = Terminal::new(backend) {
+        terminal = terminal_sec
+    } else {
+        todo!("Error retrieving terminal");
+    }
 }
-

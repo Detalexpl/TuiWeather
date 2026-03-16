@@ -2,7 +2,7 @@ use crate::getting_location::*;
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize)]
 pub struct WeatherResponse {
-    current: Option<Current>,
+    pub current: Option<Current>,
 }
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Current {
@@ -23,14 +23,14 @@ pub struct Current {
 }
 
 //this function is yous to create api url
-pub async fn get_url(location: Location) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn get_url(location: &Location) -> Result<String, Box<dyn std::error::Error>> {
     let url = format!(
         "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&current=temperature_2m,is_day,rain,showers,weather_code,cloud_cover,snowfall,pressure_msl,surface_pressure,wind_speed_10m,relative_humidity_2m,wind_direction_10m&timezone=auto",
         location.latitude, location.longitude
     );
     Ok(url)
 }
-pub async fn get_weather(url: String) -> Result<WeatherResponse, reqwest::Error> {
+pub async fn get_weather(url: String) -> Result<WeatherResponse, Box<dyn std::error::Error>> {
     let weather_response: WeatherResponse =
         reqwest::Client::new().get(url).send().await?.json().await?;
     Ok(weather_response)
@@ -45,7 +45,7 @@ mod tests {
             latitude: 52.222,
             longitude: 21.01,
         };
-        let url = get_url(location).await.unwrap();
+        let url = get_url(&location).await.unwrap();
 
         assert_eq!(
             url,
