@@ -9,6 +9,7 @@ mod app;
 pub mod downloading;
 pub mod getting_location;
 pub mod getting_weather;
+mod ui;
 
 #[tokio::main]
 async fn main() {

@@ -6,6 +6,8 @@ use ratatui::crossterm::event::{Event,self};
 use std::path::PathBuf;
 use crossterm::event::{KeyCode, KeyEventKind};
 use crate::getting_weather::{get_url, get_weather, Current };
+use crate::ui::ui;
+
 #[derive(Debug)]
 enum Mode{
     Normal,
@@ -122,7 +124,4 @@ pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -
             }
         }
     }
-}
-fn ui(frame: &mut Frame,app : &mut AppState){
-    todo!()
 }
