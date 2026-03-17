@@ -13,12 +13,7 @@ mod ui;
 
 #[tokio::main]
 async fn main() {
-    if let Err(_) = enable_raw_mode() {
-        todo!("Add error in enabling raw mode.");
-    }
-    if let Err(_) = execute!(stdout(), EnterAlternateScreen, EnableMouseCapture) {
-        todo!("error with execute")
-    }
+    ratatui::init();
     let mut app: AppState;
     if let Ok(app_state) = AppState::new() {
         app = app_state
@@ -33,4 +28,5 @@ async fn main() {
         todo!("Error retrieving terminal");
     }
     let _ = run(&mut terminal, &mut app).await.unwrap();
+    ratatui::restore()
 }

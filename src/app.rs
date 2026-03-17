@@ -17,6 +17,7 @@ pub enum Mode{
 #[derive(Debug)]
 pub struct AppState {
     pub location_input: String,
+    pub location: String,
     pub mode:Mode,
     pub valid_location: Option<Location>,
     pub path: PathBuf,
@@ -27,6 +28,7 @@ impl AppState {
         if let Some(path) = getting_path() {
             Ok(AppState {
                 location_input: String::new(),
+                location: String::new(),
                 mode:Mode::Normal,
                 valid_location: None,
                 path,
@@ -37,17 +39,7 @@ impl AppState {
             Err("unable to get path".into())
         }
     }
-    pub fn validate_location(&mut self) {
-        if let Ok(location) = get_location(&self.path, &self.location_input) {
-            if let Some(location) = location {
-                self.valid_location = Some(location);
-            } else {
-                self.valid_location = None;
-            }
-        } else {
-            self.valid_location = None;
-        }
-    }
+
     pub fn clean_input(&mut self) {
         self.location_input.clear();
     }
@@ -55,10 +47,7 @@ impl AppState {
 
 pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -> Result<(), String> {
     loop {
-        //match terminal.draw(|f| ui(f, app)) {
-          //  Err(e) => return Err(e.to_string()),
-            //Ok(_) => {}
-        //}
+
         terminal.draw(|mut f| {ui (f, app)}).map_err(|err| err.to_string())?;
         if let Event::Key(key) = event::read().map_err(|_| "Unable to get key event".to_string())? {
             if key.kind == KeyEventKind::Release{
@@ -76,6 +65,7 @@ pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -
                         }
                         KeyCode::Enter => {
                             app.valid_location = get_location(&app.path,&app.location_input).map_err(|_| "Unable to get location".to_string())?;
+                            app.location= app.location_input.clone();
                             app.location_input.clear();
                             app.mode = Mode::Normal;
                         }
@@ -100,6 +90,7 @@ pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -
                                 Some(location) => {
                                     if let Ok(url) = get_url(&location).await {
                                         app.weather = get_weather(url).await.map_err(|e| e.to_string())?.current;
+                                        
                                     }
                                     else{
                                         return Err("Unable to get Api url".to_string());
@@ -124,5 +115,6 @@ pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -
                 }
             }
         }
+        eprintln!("{:?}", app.valid_location);
     }
 }
