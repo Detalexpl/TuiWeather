@@ -10,7 +10,7 @@ pub fn getting_path() -> Option<PathBuf> {
         .map(|proj_dirs| proj_dirs.data_local_dir().to_path_buf())
 }
 //this function download file worldcities.csv needed to find out location
-pub async fn downloading_data(path: PathBuf) -> Result<(), String> {
+pub async fn downloading_data(path: &PathBuf) -> Result<(), String> {
     //dbg!(&path);
     let reqs = reqwest::Client::new().get("https://raw.githubusercontent.com/Detalexpl/TuiWeather/refs/heads/master/worldcities.csv")
         .send().await.map_err(|e| e.to_string())?.text().await.map_err(|e| e.to_string())?;

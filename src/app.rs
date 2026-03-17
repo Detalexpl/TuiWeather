@@ -1,4 +1,4 @@
-use crate::downloading::getting_path;
+use crate::downloading::{downloading_data, getting_path};
 use crate::getting_location::{Location, get_location};
 use ratatui::{Terminal};
 use ratatui::backend::Backend;
@@ -46,6 +46,15 @@ impl AppState {
 }
 
 pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -> Result<(), String> {
+
+    let path_to_cities = app.path.clone().join("cities.csv");
+    match path_to_cities.exists() {
+        true => {}
+        false => {
+            downloading_data(&app.path).await?;
+        }
+    }
+
     loop {
 
         terminal.draw(|mut f| {ui (f, app)}).map_err(|err| err.to_string())?;
@@ -64,7 +73,11 @@ pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -
                             app.location_input.pop();
                         }
                         KeyCode::Enter => {
-                            app.valid_location = get_location(&app.path,&app.location_input).map_err(|_| "Unable to get location".to_string())?;
+
+                            app.valid_location = get_location(&path_to_cities, &app.location_input).map_err(|_| "Unable to get location".to_string())?;
+                            if let Some(location) = &app.valid_location {
+                                app.weather = get_weather(get_url(location).await.map_err(|_| "Unable to get location".to_string())?).await.unwrap().current;
+                            }
                             app.location= app.location_input.clone();
                             app.location_input.clear();
                             app.mode = Mode::Normal;
