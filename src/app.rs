@@ -1,6 +1,6 @@
 use crate::downloading::getting_path;
 use crate::getting_location::{Location, get_location};
-use ratatui::{Frame, Terminal};
+use ratatui::{Terminal};
 use ratatui::backend::Backend;
 use ratatui::crossterm::event::{Event,self};
 use std::path::PathBuf;
@@ -9,18 +9,18 @@ use crate::getting_weather::{get_url, get_weather, Current };
 use crate::ui::ui;
 
 #[derive(Debug)]
-enum Mode{
+pub enum Mode{
     Normal,
     Typing,
     Exiting,
 }
 #[derive(Debug)]
 pub struct AppState {
-    location_input: String,
-    mode:Mode,
-    valid_location: Option<Location>,
-    path: PathBuf,
-    weather: Option<Current>,
+    pub location_input: String,
+    pub mode:Mode,
+    pub valid_location: Option<Location>,
+    pub path: PathBuf,
+    pub weather: Option<Current>,
 }
 impl AppState {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
@@ -55,12 +55,13 @@ impl AppState {
 
 pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -> Result<(), String> {
     loop {
-        match terminal.draw(|f| ui(f, app)) {
-            Err(e) => return Err(e.to_string()),
-            Ok(_) => {}
-        }
+        //match terminal.draw(|f| ui(f, app)) {
+          //  Err(e) => return Err(e.to_string()),
+            //Ok(_) => {}
+        //}
+        terminal.draw(|mut f| {ui (f, app)}).map_err(|err| err.to_string())?;
         if let Event::Key(key) = event::read().map_err(|_| "Unable to get key event".to_string())? {
-            if key.kind == KeyEventKind::Press{
+            if key.kind == KeyEventKind::Release{
                 continue;
             }
             match app.mode {
@@ -113,7 +114,7 @@ pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -
                 Mode::Exiting => {
                     match key.code {
                         KeyCode::Char('y') => {
-                            return Ok(())
+                            break Ok(())
                         }
                         KeyCode::Char('n') => {
                             app.mode = Mode::Normal;

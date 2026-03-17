@@ -1,4 +1,4 @@
-use crate::app::AppState;
+use crate::app::{run, AppState};
 use crossterm::event::EnableMouseCapture;
 use crossterm::execute;
 use crossterm::terminal::{EnterAlternateScreen, enable_raw_mode};
@@ -32,4 +32,5 @@ async fn main() {
     } else {
         todo!("Error retrieving terminal");
     }
+    let _ = run(&mut terminal, &mut app).await.unwrap();
 }
