@@ -20,8 +20,7 @@ impl ColorPalette {
                 return ColorPalette{bg:Color::LightBlue ,fg:Color::Yellow};
             }else if weather.weather_code == 45 || weather.weather_code == 48 {
                 return ColorPalette{bg:Color::Gray,fg:Color::Black};
-            }
-            else if weather.weather_code == 56 || weather.weather_code == 57 {
+            }else if weather.weather_code == 56 || weather.weather_code == 57 {
                 return ColorPalette{bg:Color::Gray,fg:Color::LightBlue};
             }else if weather.weather_code == 61 || weather.weather_code == 63 || weather.weather_code == 65 {
                 return ColorPalette{bg:Color::Gray,fg:Color::LightBlue};
@@ -65,8 +64,8 @@ pub fn ui(frame: &mut Frame, app: &mut AppState){
         .title_alignment(Alignment::Center);
     let title = Paragraph::new(Text::from(app.location.clone()))
         .style(Style::default()
-            //.fg(ColorPalette::get_colors(&app).fg))
-        .fg(Color::Blue))
+            .fg(ColorPalette::get_colors(&app).fg)
+        )
         .block(title_block);
 
     frame.render_widget(title, chunks[0]);

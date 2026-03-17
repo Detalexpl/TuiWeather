@@ -128,6 +128,6 @@ pub async  fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState,) -
                 }
             }
         }
-        eprintln!("{:?}", app.valid_location);
+        //eprintln!("{:?}", app.valid_location);
     }
 }
