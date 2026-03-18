@@ -29,7 +29,7 @@ pub struct AppState {
 impl AppState {
     pub fn new() -> Result<Self, String> {
         let battery =
-            Self::get_battery_level().map_err(|e| format!("Failed to get battery level: {}", e))?;
+            get_battery_level().map_err(|e| format!("Failed to get battery level: {}", e))?;
         if let Some(path) = getting_path() {
             Ok(AppState {
                 location_input: String::new(),
@@ -44,20 +44,21 @@ impl AppState {
             Err("unable to get path".into())
         }
     }
-    pub fn get_battery_level() -> Result<Vec<f32>, String> {
-        let batteries = Manager::new().map_err(|_| "battery manager initialization failed")?;
-        let mut levels: Vec<f32> = Vec::new();
-        for battery in batteries
-            .batteries()
-            .map_err(|_| "battery manager initialization failed")?
-        {
-            if let Ok(battery) = battery {
-                let percentage = battery.state_of_charge().value * 100.0;
-                levels.push(percentage);
-            }
+
+}
+pub fn get_battery_level() -> Result<Vec<f32>, String> {
+    let batteries = Manager::new().map_err(|_| "battery manager initialization failed")?;
+    let mut levels: Vec<f32> = Vec::new();
+    for battery in batteries
+        .batteries()
+        .map_err(|_| "battery manager initialization failed")?
+    {
+        if let Ok(battery) = battery {
+            let percentage = battery.state_of_charge().value * 100.0;
+            levels.push(percentage);
         }
-        Ok(levels)
     }
+    Ok(levels)
 }
 
 pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> Result<(), String> {
@@ -120,16 +121,19 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     KeyCode::Char('s') => {
                         app.mode = Mode::Typing;
                     }
-                    KeyCode::Char('r') => match &app.valid_location {
-                        Some(location) => {
-                            if let Ok(url) = get_url(&location).await {
-                                app.weather =
-                                    get_weather(url).await.map_err(|e| e.to_string())?.current;
-                            } else {
-                                return Err("Unable to get Api url".to_string());
+                    KeyCode::Char('r') => {
+                        match &app.valid_location {
+                            Some(location) => {
+                                if let Ok(url) = get_url(&location).await {
+                                    app.weather =
+                                        get_weather(url).await.map_err(|e| e.to_string())?.current;
+                                } else {
+                                    return Err("Unable to get Api url".to_string());
+                                }
                             }
+                            None => {}
                         }
-                        None => {}
+                        app.battery = get_battery_level().map_err(|_| "unable to get battery info".to_string())?;
                     },
                     _ => {}
                 },
