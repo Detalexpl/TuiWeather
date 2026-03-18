@@ -1,5 +1,5 @@
-use crossterm::event::KeyCode::F;
 use crate::app::AppState;
+use crossterm::event::KeyCode::F;
 use crossterm::style::Color::DarkGreen;
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
@@ -111,10 +111,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .split(frame.area());
     let header_chunks = Layout::default()
         .direction(Horizontal)
-        .constraints([
-            Constraint::Percentage(70),
-            Constraint::Min(10),
-        ])
+        .constraints([Constraint::Percentage(70), Constraint::Min(10)])
         .split(chunks[0]);
 
     let location_block = Block::default()
@@ -133,18 +130,27 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg))
         .border_type(BorderType::Rounded);
-//    let battery = Paragraph::new(Text::from(""))
-//        .style(Style::default().fg(colors.fg))
-//        .block(battery_block);
+    //    let battery = Paragraph::new(Text::from(""))
+    //        .style(Style::default().fg(colors.fg))
+    //        .block(battery_block);
     let mut batteries = Vec::<ListItem>::new();
 
-    for percentage in &app.battery{
-        if percentage >=&40.0{
-            batteries.push(ListItem::new(Line::from(Span::styled(format!("Battery: {:3}%", percentage),Style::default().fg(Color::Green)))));
-        }else if percentage >&15.0{
-            batteries.push(ListItem::new(Line::from(Span::styled(format!("Battery: {:3}%",percentage),Style::default().fg(Color::Yellow)))));
-        }else{
-            batteries.push(ListItem::new(Line::from(Span::styled(format!("Battery: {:3}%",percentage),Style::default().fg(Color::Red)))))
+    for percentage in &app.battery {
+        if percentage >= &40.0 {
+            batteries.push(ListItem::new(Line::from(Span::styled(
+                format!("Battery: {:3}%", percentage),
+                Style::default().fg(Color::Green),
+            ))));
+        } else if percentage > &15.0 {
+            batteries.push(ListItem::new(Line::from(Span::styled(
+                format!("Battery: {:3}%", percentage),
+                Style::default().fg(Color::Yellow),
+            ))));
+        } else {
+            batteries.push(ListItem::new(Line::from(Span::styled(
+                format!("Battery: {:3}%", percentage),
+                Style::default().fg(Color::Red),
+            ))))
         }
     }
     let list = List::new(batteries).block(battery_block);

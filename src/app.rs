@@ -1,14 +1,14 @@
-use std::io;
 use crate::downloading::{downloading_data, getting_path};
 use crate::getting_location::{Location, get_location};
 use crate::getting_weather::{Current, get_url, get_weather};
 use crate::ui::ui;
+use battery::Manager;
 use crossterm::event::{KeyCode, KeyEventKind};
 use ratatui::Terminal;
 use ratatui::backend::Backend;
 use ratatui::crossterm::event::{self, Event};
+use std::io;
 use std::path::PathBuf;
-use battery::Manager;
 
 #[derive(Debug)]
 pub enum Mode {
@@ -27,8 +27,9 @@ pub struct AppState {
     pub battery: Vec<f32>,
 }
 impl AppState {
-    pub fn new() -> Result<Self,String > {
-        let battery = Self::get_battery_level().map_err(|e| format!("Failed to get battery level: {}", e))?;
+    pub fn new() -> Result<Self, String> {
+        let battery =
+            Self::get_battery_level().map_err(|e| format!("Failed to get battery level: {}", e))?;
         if let Some(path) = getting_path() {
             Ok(AppState {
                 location_input: String::new(),
@@ -43,13 +44,16 @@ impl AppState {
             Err("unable to get path".into())
         }
     }
-    pub fn get_battery_level() -> Result<Vec<f32>,String>{
+    pub fn get_battery_level() -> Result<Vec<f32>, String> {
         let batteries = Manager::new().map_err(|_| "battery manager initialization failed")?;
-        let mut levels:Vec<f32> = Vec::new();
-        for battery in batteries.batteries().map_err(|_| "battery manager initialization failed")? {
+        let mut levels: Vec<f32> = Vec::new();
+        for battery in batteries
+            .batteries()
+            .map_err(|_| "battery manager initialization failed")?
+        {
             if let Ok(battery) = battery {
-                let percentage= battery.state_of_charge().value * 100.0;
-                levels.push( percentage );
+                let percentage = battery.state_of_charge().value * 100.0;
+                levels.push(percentage);
             }
         }
         Ok(levels)
