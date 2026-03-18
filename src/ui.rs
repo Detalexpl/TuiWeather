@@ -1,53 +1,106 @@
+use crossterm::event::KeyCode::F;
+use crate::app::AppState;
 use crossterm::style::Color::DarkGreen;
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout};
 use ratatui::style::{Color, Style};
-use ratatui::text::Text;
-use ratatui::widgets::{Block, BorderType, Borders, Paragraph, TitlePosition};
-use crate::app::AppState;
-struct ColorPalette{
-    bg:Color,
-    fg:Color,
+use ratatui::text::{Line, Span, Text};
+use ratatui::widgets::{Block, BorderType, Borders, List, ListItem, Paragraph, TitlePosition};
+struct ColorPalette {
+    bg: Color,
+    fg: Color,
 }
 impl ColorPalette {
     pub fn get_colors(app: &AppState) -> ColorPalette {
-        if let Some(weather)= &app.weather {
-            if weather.weather_code == 0{
-                return ColorPalette{bg:Color::Blue, fg:Color::Yellow, };
+        if let Some(weather) = &app.weather {
+            if weather.weather_code == 0 {
+                return ColorPalette {
+                    bg: Color::Blue,
+                    fg: Color::Yellow,
+                };
+            } else if weather.weather_code == 1
+                || weather.weather_code == 2
+                || weather.weather_code == 3
+            {
+                return ColorPalette {
+                    bg: Color::LightBlue,
+                    fg: Color::Yellow,
+                };
+            } else if weather.weather_code == 45 || weather.weather_code == 48 {
+                return ColorPalette {
+                    bg: Color::Gray,
+                    fg: Color::Black,
+                };
+            } else if weather.weather_code == 56 || weather.weather_code == 57 {
+                return ColorPalette {
+                    bg: Color::Gray,
+                    fg: Color::LightBlue,
+                };
+            } else if weather.weather_code == 61
+                || weather.weather_code == 63
+                || weather.weather_code == 65
+            {
+                return ColorPalette {
+                    bg: Color::Gray,
+                    fg: Color::LightBlue,
+                };
+            } else if weather.weather_code == 66 || weather.weather_code == 67 {
+                return ColorPalette {
+                    bg: Color::DarkGray,
+                    fg: Color::Black,
+                };
+            } else if weather.weather_code == 71
+                || weather.weather_code == 73
+                || weather.weather_code == 75
+            {
+                return ColorPalette {
+                    bg: Color::Gray,
+                    fg: Color::LightCyan,
+                };
+            } else if weather.weather_code == 77 {
+                return ColorPalette {
+                    bg: Color::DarkGray,
+                    fg: Color::White,
+                };
+            } else if weather.weather_code == 80
+                || weather.weather_code == 81
+                || weather.weather_code == 82
+            {
+                return ColorPalette {
+                    bg: Color::Gray,
+                    fg: Color::Blue,
+                };
+            } else if weather.weather_code == 85 || weather.weather_code == 86 {
+                return ColorPalette {
+                    bg: Color::DarkGray,
+                    fg: Color::White,
+                };
+            } else if weather.weather_code == 95
+                || weather.weather_code == 96
+                || weather.weather_code == 99
+            {
+                return ColorPalette {
+                    bg: Color::DarkGray,
+                    fg: Color::LightYellow,
+                };
+            } else {
+                return ColorPalette {
+                    bg: Color::default(),
+                    fg: Color::default(),
+                };
             }
-            else if weather.weather_code == 1 || weather.weather_code == 2 || weather.weather_code == 3 {
-                return ColorPalette{bg:Color::LightBlue ,fg:Color::Yellow};
-            }else if weather.weather_code == 45 || weather.weather_code == 48 {
-                return ColorPalette{bg:Color::Gray,fg:Color::Black};
-            }else if weather.weather_code == 56 || weather.weather_code == 57 {
-                return ColorPalette{bg:Color::Gray,fg:Color::LightBlue};
-            }else if weather.weather_code == 61 || weather.weather_code == 63 || weather.weather_code == 65 {
-                return ColorPalette{bg:Color::Gray,fg:Color::LightBlue};
-            }else if weather.weather_code == 66 || weather.weather_code == 67 {
-                return ColorPalette{bg:Color::DarkGray,fg:Color::Black};
-            }else if weather.weather_code == 71 || weather.weather_code == 73 || weather.weather_code == 75 {
-                return ColorPalette{bg:Color::Gray,fg:Color::LightCyan};
-            }else if weather.weather_code == 77{
-                return ColorPalette{bg:Color::DarkGray,fg:Color::White};
-            }else if weather.weather_code == 80 || weather.weather_code == 81 || weather.weather_code == 82 {
-                return ColorPalette{bg:Color::Gray,fg:Color::Blue};
-            }else if weather.weather_code == 85 || weather.weather_code == 86 {
-                return ColorPalette{bg:Color::DarkGray,fg:Color::White};
-            }else if weather.weather_code == 95 || weather.weather_code == 96 || weather.weather_code == 99 {
-                return ColorPalette{bg:Color::DarkGray,fg:Color::LightYellow};
-            }
-            else{
-                return ColorPalette{bg:Color::default(),fg:Color::default()};
-            }
-        }else{
-            return ColorPalette{bg:Color::default(),fg:Color::default()};
+        } else {
+            return ColorPalette {
+                bg: Color::default(),
+                fg: Color::default(),
+            };
         }
     }
 }
 
-pub fn ui(frame: &mut Frame, app: &mut AppState){
-
+pub fn ui(frame: &mut Frame, app: &mut AppState) {
+    let colors = ColorPalette::get_colors(&app);
     let chunks = Layout::default()
         .direction(Vertical)
         .constraints([
@@ -56,18 +109,47 @@ pub fn ui(frame: &mut Frame, app: &mut AppState){
             Constraint::Length(3),
         ])
         .split(frame.area());
-    let title_block = Block::default()
+    let header_chunks = Layout::default()
+        .direction(Horizontal)
+        .constraints([
+            Constraint::Percentage(70),
+            Constraint::Min(10),
+        ])
+        .split(chunks[0]);
+
+    let location_block = Block::default()
         .borders(Borders::ALL)
-        .style(Style::default().bg(ColorPalette::get_colors(&app).bg))
-        .border_type(BorderType::HeavyTripleDashed)
         .title("Location")
-        .title_alignment(Alignment::Center);
-    let title = Paragraph::new(Text::from(app.location.clone()))
-        .style(Style::default()
-            .fg(ColorPalette::get_colors(&app).fg)
-        )
-        .block(title_block);
+        .title_alignment(Alignment::Center)
+        .style(Style::default().bg(colors.bg))
+        .border_type(BorderType::Rounded);
 
-    frame.render_widget(title, chunks[0]);
+    let location = Paragraph::new(Text::from(app.location.clone()))
+        .style(Style::default().fg(colors.fg))
+        .block(location_block);
+    let battery_block = Block::default()
+        .borders(Borders::ALL)
+        .title("Battery")
+        .title_alignment(Alignment::Center)
+        .style(Style::default().bg(colors.bg).fg(colors.fg))
+        .border_type(BorderType::Rounded);
+//    let battery = Paragraph::new(Text::from(""))
+//        .style(Style::default().fg(colors.fg))
+//        .block(battery_block);
+    let mut batteries = Vec::<ListItem>::new();
 
+    for percentage in &app.battery{
+        if percentage >=&40.0{
+            batteries.push(ListItem::new(Line::from(Span::styled(format!("Battery: {:3}%", percentage),Style::default().fg(Color::Green)))));
+        }else if percentage >&15.0{
+            batteries.push(ListItem::new(Line::from(Span::styled(format!("Battery: {:3}%",percentage),Style::default().fg(Color::Yellow)))));
+        }else{
+            batteries.push(ListItem::new(Line::from(Span::styled(format!("Battery: {:3}%",percentage),Style::default().fg(Color::Red)))))
+        }
+    }
+    let list = List::new(batteries).block(battery_block);
+
+    frame.render_widget(list, header_chunks[1]);
+    frame.render_widget(location, header_chunks[0]);
+    //frame.render_widget(battery, header_chunks[1]);
 }

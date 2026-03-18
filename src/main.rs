@@ -1,4 +1,4 @@
-use crate::app::{run, AppState};
+use crate::app::{AppState, run};
 use crossterm::event::EnableMouseCapture;
 use crossterm::execute;
 use crossterm::terminal::{EnterAlternateScreen, enable_raw_mode};

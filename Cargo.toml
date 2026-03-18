@@ -1,6 +1,6 @@
 [package]
 name = "TuiWeather"
-version = "0.2.7"
+version = "0.2.8"
 edition = "2024"
 license = "MIT"
 description = "Simple Tui app for showing weather"
@@ -8,7 +8,7 @@ authors = ["Detalex<frazeb09@gmail.com>"]
 repository = "https://github.com/Detalexpl/TuiWeather"
 
 [dependencies]
-
+battery = "0.7.8"
 directories = "6.0.0"
 serde = {version = "1.0.228", features = ["derive"]}
 reqwest = {version = "0.13.2",features = ["json"]}
