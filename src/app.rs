@@ -7,7 +7,7 @@ use crossterm::event::{KeyCode, KeyEventKind};
 use ratatui::Terminal;
 use ratatui::backend::Backend;
 use ratatui::crossterm::event::{self, Event};
-use std::io;
+
 use std::path::PathBuf;
 
 #[derive(Debug)]
@@ -25,7 +25,7 @@ pub struct AppState {
     pub path: PathBuf,
     pub weather: Option<Current>,
     pub battery: Vec<f32>,
-    pub tester:bool,
+    //pub tester: bool,
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
@@ -40,13 +40,12 @@ impl AppState {
                 path,
                 weather: None,
                 battery,
-                tester: true,
+                //tester: true,
             })
         } else {
             Err("unable to get path".into())
         }
     }
-
 }
 pub fn get_battery_level() -> Result<Vec<f32>, String> {
     let batteries = Manager::new().map_err(|_| "battery manager initialization failed")?;
@@ -74,7 +73,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
 
     loop {
         terminal
-            .draw(|mut f| ui(f, app))
+            .draw(|f| ui(f, app))
             .map_err(|err| err.to_string())?;
         //app.tester = false;
         if let Event::Key(key) = event::read().map_err(|_| "Unable to get key event".to_string())? {
@@ -123,7 +122,6 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     }
                     KeyCode::Char('s') => {
                         app.mode = Mode::Typing;
-
                     }
                     KeyCode::Char('r') => {
                         match &app.valid_location {
@@ -138,8 +136,9 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                             None => {}
                         }
 
-                        app.battery = get_battery_level().map_err(|_| "unable to get battery info".to_string())?;
-                    },
+                        app.battery = get_battery_level()
+                            .map_err(|_| "unable to get battery info".to_string())?;
+                    }
                     _ => {}
                 },
                 Mode::Exiting => match key.code {
@@ -151,6 +150,5 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                 },
             }
         }
-
     }
 }
