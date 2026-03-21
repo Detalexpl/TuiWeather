@@ -1,13 +1,12 @@
 use crate::app::{AppState, Mode};
-use crossterm::event::KeyCode::F;
-use crossterm::style::Color::DarkGreen;
+
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::{Color, Style};
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{
-    Block, BorderType, Borders, Clear, List, ListItem, Paragraph, TitlePosition,
+    Block, BorderType, Borders, Clear, List, ListItem, Paragraph,
 };
 
 struct ColorPalette {
@@ -18,41 +17,41 @@ impl ColorPalette {
     pub fn get_colors(app: &AppState) -> ColorPalette {
         if let Some(weather) = &app.weather {
             if weather.weather_code == 0 {
-                return ColorPalette {
+                 ColorPalette {
                     bg: Color::Blue,
                     fg: Color::Yellow,
-                };
+                }
             } else if weather.weather_code == 1
                 || weather.weather_code == 2
                 || weather.weather_code == 3
             {
-                return ColorPalette {
+                 ColorPalette {
                     bg: Color::LightBlue,
                     fg: Color::Yellow,
-                };
+                }
             } else if weather.weather_code == 45 || weather.weather_code == 48 {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::Gray,
                     fg: Color::Black,
-                };
+                }
             } else if weather.weather_code == 56 || weather.weather_code == 57 {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::Gray,
                     fg: Color::LightBlue,
-                };
+                }
             } else if weather.weather_code == 61
                 || weather.weather_code == 63
                 || weather.weather_code == 65
             {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::Gray,
                     fg: Color::LightBlue,
-                };
+                }
             } else if weather.weather_code == 66 || weather.weather_code == 67 {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::DarkGray,
                     fg: Color::Black,
-                };
+                }
             } else if weather.weather_code == 71
                 || weather.weather_code == 73
                 || weather.weather_code == 75
