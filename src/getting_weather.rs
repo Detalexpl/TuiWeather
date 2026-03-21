@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct WeatherResponse {
     pub current: Option<Current>,
 }
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Current {
     pub time: String,
     pub interval: u16,

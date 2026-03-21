@@ -25,6 +25,7 @@ pub struct AppState {
     pub path: PathBuf,
     pub weather: Option<Current>,
     pub battery: Vec<f32>,
+    pub tester:bool,
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
@@ -39,6 +40,7 @@ impl AppState {
                 path,
                 weather: None,
                 battery,
+                tester: true,
             })
         } else {
             Err("unable to get path".into())
@@ -74,6 +76,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
         terminal
             .draw(|mut f| ui(f, app))
             .map_err(|err| err.to_string())?;
+        //app.tester = false;
         if let Event::Key(key) = event::read().map_err(|_| "Unable to get key event".to_string())? {
             if key.kind == KeyEventKind::Release {
                 continue;
@@ -120,6 +123,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     }
                     KeyCode::Char('s') => {
                         app.mode = Mode::Typing;
+
                     }
                     KeyCode::Char('r') => {
                         match &app.valid_location {
@@ -133,6 +137,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                             }
                             None => {}
                         }
+
                         app.battery = get_battery_level().map_err(|_| "unable to get battery info".to_string())?;
                     },
                     _ => {}
@@ -146,6 +151,6 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                 },
             }
         }
-        //eprintln!("{:?}", app.valid_location);
+
     }
 }
