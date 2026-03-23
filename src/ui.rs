@@ -144,26 +144,32 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     //        .style(Style::default().fg(colors.fg))
     //        .block(battery_block);
     let mut batteries = Vec::<ListItem>::new();
+    if app.battery.is_empty() {
+        frame.render_widget(location,chunks[0])
+    }else{
+        for percentage in &app.battery {
+            if percentage >= &40.0 {
+                batteries.push(ListItem::new(Line::from(Span::styled(
+                    format!("Battery: {:.0}%", percentage),
+                    Style::default().fg(Color::Green),
+                ))));
+            } else if percentage > &15.0 {
+                batteries.push(ListItem::new(Line::from(Span::styled(
+                    format!("Battery: {:.0}%", percentage),
+                    Style::default().fg(Color::Yellow),
+                ))));
+            } else {
+                batteries.push(ListItem::new(Line::from(Span::styled(
+                    format!("Battery: {:.0}%", percentage),
+                    Style::default().fg(Color::Red),
+                ))))
+            }
+        }let list = List::new(batteries).block(battery_block);
 
-    for percentage in &app.battery {
-        if percentage >= &40.0 {
-            batteries.push(ListItem::new(Line::from(Span::styled(
-                format!("Battery: {:.0}%", percentage),
-                Style::default().fg(Color::Green),
-            ))));
-        } else if percentage > &15.0 {
-            batteries.push(ListItem::new(Line::from(Span::styled(
-                format!("Battery: {:.0}%", percentage),
-                Style::default().fg(Color::Yellow),
-            ))));
-        } else {
-            batteries.push(ListItem::new(Line::from(Span::styled(
-                format!("Battery: {:.0}%", percentage),
-                Style::default().fg(Color::Red),
-            ))))
-        }
+        frame.render_widget(list, header_chunks[1]);
+        frame.render_widget(location, header_chunks[0]);
     }
-    let list = List::new(batteries).block(battery_block);
+
     let main_block = Block::default()
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
@@ -221,8 +227,6 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         }
     }
     frame.render_widget(main, chunks[1]);
-    frame.render_widget(list, header_chunks[1]);
-    frame.render_widget(location, header_chunks[0]);
     match app.mode {
         Mode::Typing => {
             let typing_chunk = centered_rect(35, 35, frame.area());
