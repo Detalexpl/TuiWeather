@@ -116,7 +116,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .direction(Horizontal)
         .constraints([Constraint::Percentage(70), Constraint::Min(15)])
         .split(chunks[0]);
-    let main_chunks = Layout::default()
+    let _main_chunks = Layout::default()
         .direction(Horizontal)
         .constraints([Constraint::Percentage(60), Constraint::Percentage(40)])
         .split(chunks[1]);
