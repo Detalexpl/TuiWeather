@@ -7,9 +7,6 @@ use crossterm::event::{KeyCode, KeyEventKind};
 use ratatui::Terminal;
 use ratatui::backend::Backend;
 use ratatui::crossterm::event::{self, Event};
-use std::os::raw::c_char;
-
-use crossterm::event::Event::Key;
 use std::path::PathBuf;
 
 #[derive(Debug)]
