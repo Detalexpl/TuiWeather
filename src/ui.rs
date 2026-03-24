@@ -3,6 +3,7 @@ use crate::app::{AppState, Mode};
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
+use ratatui::prelude::Stylize;
 use ratatui::style::{Color, Style};
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph};
@@ -54,47 +55,47 @@ impl ColorPalette {
                 || weather.weather_code == 73
                 || weather.weather_code == 75
             {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::Gray,
                     fg: Color::LightCyan,
-                };
+                }
             } else if weather.weather_code == 77 {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::DarkGray,
                     fg: Color::White,
-                };
+                }
             } else if weather.weather_code == 80
                 || weather.weather_code == 81
                 || weather.weather_code == 82
             {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::Gray,
                     fg: Color::Blue,
-                };
+                }
             } else if weather.weather_code == 85 || weather.weather_code == 86 {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::DarkGray,
                     fg: Color::White,
-                };
+                }
             } else if weather.weather_code == 95
                 || weather.weather_code == 96
                 || weather.weather_code == 99
             {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::DarkGray,
                     fg: Color::LightYellow,
-                };
+                }
             } else {
-                return ColorPalette {
+                ColorPalette {
                     bg: Color::default(),
                     fg: Color::default(),
-                };
+                }
             }
         } else {
-            return ColorPalette {
+            ColorPalette {
                 bg: Color::default(),
                 fg: Color::default(),
-            };
+            }
         }
     }
 }
@@ -209,24 +210,36 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     .block(last_char_block);
     match app.mode {
         Mode::Normal => {
-            let cheat_sheet = Paragraph::new(Line::from(
-                Span::styled(
-                    "Search your location (s)   Reload Weather Data (r)   Quit app (q)",
-                    Style::default().fg(colors.fg).bg(colors.bg),
-                )
-                .into_centered_line(),
-            ))
+            let cheat_sheet = Paragraph::new(
+                Line::from(vec![
+                    "Reload ".fg(colors.fg),
+                    "<R>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
+                    "Search location ".fg(colors.fg),
+                    "<S>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
+                    "Quit ".fg(colors.fg),
+                    "<Q>".fg(Color::Rgb(255, 50, 50)),
+                ])
+                .centered(),
+            )
             .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
         Mode::Typing => {
-            let cheat_sheet = Paragraph::new(Line::from(
-                Span::styled(
-                    "Escape from typing mode (ESC)   Delete character (BACKSPACE)   Enter(ENTER)",
-                    Style::default().fg(colors.fg).bg(colors.bg),
-                )
-                .into_centered_line(),
-            ))
+            let cheat_sheet = Paragraph::new(
+                Line::from(vec![
+                    "Escape ".fg(colors.fg),
+                    "<ESC>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
+                    "Delete ".fg(colors.fg),
+                    "<BACKSPACE>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
+                    "Search ".fg(colors.fg),
+                    "<ENTER>".fg(Color::Rgb(155, 0, 255)),
+                ])
+                .centered(),
+            )
             .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
@@ -239,6 +252,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
     }
+    let _test = frame.area().height;
     frame.render_widget(main, chunks[1]);
     frame.render_widget(last_char, footer_chunks[2]);
     match app.mode {
