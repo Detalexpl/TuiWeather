@@ -5,9 +5,7 @@ use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::{Color, Style};
 use ratatui::text::{Line, Span, Text};
-use ratatui::widgets::{
-    Block, BorderType, Borders, Clear, List, ListItem, Paragraph,
-};
+use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph};
 
 struct ColorPalette {
     bg: Color,
@@ -17,7 +15,7 @@ impl ColorPalette {
     pub fn get_colors(app: &AppState) -> ColorPalette {
         if let Some(weather) = &app.weather {
             if weather.weather_code == 0 {
-                 ColorPalette {
+                ColorPalette {
                     bg: Color::Blue,
                     fg: Color::Yellow,
                 }
@@ -25,7 +23,7 @@ impl ColorPalette {
                 || weather.weather_code == 2
                 || weather.weather_code == 3
             {
-                 ColorPalette {
+                ColorPalette {
                     bg: Color::LightBlue,
                     fg: Color::Yellow,
                 }
@@ -122,7 +120,11 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .split(chunks[1]);
     let footer_chunks = Layout::default()
         .direction(Horizontal)
-        .constraints([Constraint::Percentage(40), Constraint::Percentage(60)])
+        .constraints([
+            Constraint::Min(10),
+            Constraint::Percentage(60),
+            Constraint::Length(5),
+        ])
         .split(chunks[2]);
     let location_block = Block::default()
         .borders(Borders::ALL)
@@ -133,7 +135,8 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
 
     let location = Paragraph::new(Text::from(app.location.clone()))
         .style(Style::default().fg(colors.fg))
-        .block(location_block);
+        .block(location_block)
+        .centered();
     let battery_block = Block::default()
         .borders(Borders::ALL)
         .title("Battery")
@@ -145,8 +148,8 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     //        .block(battery_block);
     let mut batteries = Vec::<ListItem>::new();
     if app.battery.is_empty() {
-        frame.render_widget(location,chunks[0])
-    }else{
+        frame.render_widget(location, chunks[0])
+    } else {
         for percentage in &app.battery {
             if percentage >= &40.0 {
                 batteries.push(ListItem::new(Line::from(Span::styled(
@@ -164,7 +167,8 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                     Style::default().fg(Color::Red),
                 ))))
             }
-        }let list = List::new(batteries).block(battery_block);
+        }
+        let list = List::new(batteries).block(battery_block);
 
         frame.render_widget(list, header_chunks[1]);
         frame.render_widget(location, header_chunks[0]);
@@ -182,6 +186,10 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title("hints")
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg));
+    let last_char_block = Block::default()
+        .borders(Borders::ALL)
+        .border_type(BorderType::Rounded)
+        .style(Style::default().fg(colors.fg).bg(colors.bg));
     let mut temp = String::from("");
     if let Some(weather) = app.weather.clone() {
         temp = weather.temperature_2m.to_string()
@@ -192,7 +200,13 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     )))
     .centered()
     .style(Style::default().fg(colors.fg))
-    .block(main_block);
+    .block(main_block)
+    .centered();
+    let last_char = Paragraph::new(Text::from(
+        Span::styled(app.last_char.to_string(), Style::default().fg(colors.fg))
+            .into_centered_line(),
+    ))
+    .block(last_char_block);
     match app.mode {
         Mode::Normal => {
             let cheat_sheet = Paragraph::new(Line::from(
@@ -217,16 +231,16 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
         Mode::Exiting => {
-            let cheat_sheet = Paragraph::new(Line::from(
-                Span::styled(
-                    "Follow instructions on popup",
-                    Style::default().fg(colors.fg).bg(colors.bg)
-                )
-            )).block(cheat_sheet_block);
+            let cheat_sheet = Paragraph::new(Line::from(Span::styled(
+                "Follow instructions on popup",
+                Style::default().fg(colors.fg).bg(colors.bg),
+            )))
+            .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
     }
     frame.render_widget(main, chunks[1]);
+    frame.render_widget(last_char, footer_chunks[2]);
     match app.mode {
         Mode::Typing => {
             let typing_chunk = centered_rect(35, 35, frame.area());

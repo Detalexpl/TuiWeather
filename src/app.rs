@@ -7,7 +7,9 @@ use crossterm::event::{KeyCode, KeyEventKind};
 use ratatui::Terminal;
 use ratatui::backend::Backend;
 use ratatui::crossterm::event::{self, Event};
+use std::os::raw::c_char;
 
+use crossterm::event::Event::Key;
 use std::path::PathBuf;
 
 #[derive(Debug)]
@@ -26,6 +28,7 @@ pub struct AppState {
     pub weather: Option<Current>,
     pub battery: Vec<f32>,
     //pub tester: bool,
+    pub last_char: char,
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
@@ -40,7 +43,7 @@ impl AppState {
                 path,
                 weather: None,
                 battery,
-                //tester: true,
+                last_char: ' ', //tester: true,
             })
         } else {
             Err("unable to get path".into())
@@ -79,7 +82,12 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
         if let Event::Key(key) = event::read().map_err(|_| "Unable to get key event".to_string())? {
             if key.kind == KeyEventKind::Release {
                 continue;
+            } else {
+                if let Some(char) = key.code.as_char() {
+                    app.last_char = char;
+                }
             }
+
             match app.mode {
                 Mode::Typing => {
                     if key.kind == KeyEventKind::Press {
