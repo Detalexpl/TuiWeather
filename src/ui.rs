@@ -1,3 +1,4 @@
+use std::time::SystemTime;
 use crate::app::{AppState, Mode};
 
 use ratatui::Frame;
@@ -191,6 +192,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
         .style(Style::default().fg(colors.fg).bg(colors.bg));
+    let time_block = Block::default().borders(Borders::ALL).title("Time").bg(colors.bg).fg(colors.fg);
     let mut temp = String::from("");
     if let Some(weather) = app.weather.clone() {
         temp = weather.temperature_2m.to_string()
@@ -203,6 +205,10 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     .style(Style::default().fg(colors.fg))
     .block(main_block)
     .centered();
+    let time = Paragraph::new(Text::from(vec![
+        app.real_time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs().to_string().into(),
+    ]
+    )).block(time_block).centered();
     let last_char = Paragraph::new(Text::from(
         Span::styled(app.last_char.to_string(), Style::default().fg(colors.fg))
             .into_centered_line(),
@@ -255,6 +261,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     let _test = frame.area().height;
     frame.render_widget(main, chunks[1]);
     frame.render_widget(last_char, footer_chunks[2]);
+    frame.render_widget(time, footer_chunks[0]);
     match app.mode {
         Mode::Typing => {
             let typing_chunk = centered_rect(35, 35, frame.area());

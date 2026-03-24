@@ -8,6 +8,7 @@ use ratatui::Terminal;
 use ratatui::backend::Backend;
 use ratatui::crossterm::event::{self, Event};
 use std::path::PathBuf;
+use std::time::SystemTime;
 
 #[derive(Debug)]
 pub enum Mode {
@@ -26,9 +27,11 @@ pub struct AppState {
     pub battery: Vec<f32>,
     //pub tester: bool,
     pub last_char: char,
+    pub real_time: SystemTime,
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
+        let real_time = SystemTime::now();
         let battery =
             get_battery_level().map_err(|e| format!("Failed to get battery level: {}", e))?;
         if let Some(path) = getting_path() {
@@ -41,6 +44,7 @@ impl AppState {
                 weather: None,
                 battery,
                 last_char: ' ', //tester: true,
+                real_time,
             })
         } else {
             Err("unable to get path".into())
@@ -63,6 +67,8 @@ pub fn get_battery_level() -> Result<Vec<f32>, String> {
 }
 
 pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> Result<(), String> {
+     
+    app.real_time = SystemTime::now();
     let path_to_cities = app.path.clone().join("cities.csv");
     match path_to_cities.exists() {
         true => {}
