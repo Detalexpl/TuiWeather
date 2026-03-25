@@ -1,5 +1,4 @@
 use crate::app::{AppState, run};
-use chrono;
 mod app;
 pub mod downloading;
 pub mod getting_location;
@@ -8,7 +7,6 @@ mod ui;
 
 #[tokio::main]
 async fn main() {
-
     let mut terminal = ratatui::init();
     let mut app: AppState;
     if let Ok(app_state) = AppState::new() {

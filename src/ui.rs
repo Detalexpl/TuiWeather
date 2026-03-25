@@ -1,4 +1,3 @@
-use std::time::SystemTime;
 use crate::app::{AppState, Mode};
 
 use ratatui::Frame;
@@ -8,6 +7,7 @@ use ratatui::prelude::Stylize;
 use ratatui::style::{Color, Style};
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph};
+
 
 struct ColorPalette {
     bg: Color,
@@ -192,7 +192,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
         .style(Style::default().fg(colors.fg).bg(colors.bg));
-    let time_block = Block::default().borders(Borders::ALL).title("Time").bg(colors.bg).fg(colors.fg);
+    let time_block = Block::default().borders(Borders::ALL).border_type(BorderType::Rounded).title("Time").title_alignment(Alignment::Center).bg(colors.bg).fg(colors.fg);
     let mut temp = String::from("");
     if let Some(weather) = app.weather.clone() {
         temp = weather.temperature_2m.to_string()
@@ -201,19 +201,19 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         format!("temp: {}", temp),
         Style::default().fg(colors.fg),
     )))
-    .centered()
-    .style(Style::default().fg(colors.fg))
-    .block(main_block)
-    .centered();
-    let time = Paragraph::new(Text::from(vec![
-        app.real_time.duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs().to_string().into(),
+        .centered()
+        .style(Style::default().fg(colors.fg))
+        .block(main_block)
+        .centered();
+    let time = Paragraph::new(Line::from(vec![
+        app.real_time.format("%d/%m/%y  %H:%M:%S").to_string().fg(colors.fg),
     ]
     )).block(time_block).centered();
     let last_char = Paragraph::new(Text::from(
         Span::styled(app.last_char.to_string(), Style::default().fg(colors.fg))
             .into_centered_line(),
     ))
-    .block(last_char_block);
+        .block(last_char_block);
     match app.mode {
         Mode::Normal => {
             let cheat_sheet = Paragraph::new(
@@ -227,9 +227,9 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                     "Quit ".fg(colors.fg),
                     "<Q>".fg(Color::Rgb(255, 50, 50)),
                 ])
-                .centered(),
+                    .centered(),
             )
-            .block(cheat_sheet_block);
+                .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
         Mode::Typing => {
@@ -244,9 +244,9 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                     "Search ".fg(colors.fg),
                     "<ENTER>".fg(Color::Rgb(155, 0, 255)),
                 ])
-                .centered(),
+                    .centered(),
             )
-            .block(cheat_sheet_block);
+                .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
         Mode::Exiting => {
@@ -254,7 +254,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                 "Follow instructions on popup",
                 Style::default().fg(colors.fg).bg(colors.bg),
             )))
-            .block(cheat_sheet_block);
+                .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
     }
@@ -274,7 +274,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                 "insert your location: {}",
                 app.location_input
             )))
-            .block(typing_block);
+                .block(typing_block);
             frame.render_widget(Clear, typing_chunk);
             frame.render_widget(typing, typing_chunk);
         }

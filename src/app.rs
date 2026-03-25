@@ -8,7 +8,7 @@ use ratatui::Terminal;
 use ratatui::backend::Backend;
 use ratatui::crossterm::event::{self, Event};
 use std::path::PathBuf;
-use std::time::SystemTime;
+use chrono::{DateTime, Local};
 
 #[derive(Debug)]
 pub enum Mode {
@@ -27,12 +27,12 @@ pub struct AppState {
     pub battery: Vec<f32>,
     //pub tester: bool,
     pub last_char: char,
-    pub real_time: SystemTime,
+    pub real_time: DateTime<Local>,
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
-        let real_time = SystemTime::now();
-        let battery =
+        
+        let battery = 
             get_battery_level().map_err(|e| format!("Failed to get battery level: {}", e))?;
         if let Some(path) = getting_path() {
             Ok(AppState {
@@ -44,7 +44,7 @@ impl AppState {
                 weather: None,
                 battery,
                 last_char: ' ', //tester: true,
-                real_time,
+                real_time: Local::now(),
             })
         } else {
             Err("unable to get path".into())
@@ -67,8 +67,8 @@ pub fn get_battery_level() -> Result<Vec<f32>, String> {
 }
 
 pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> Result<(), String> {
-     
-    app.real_time = SystemTime::now();
+
+    
     let path_to_cities = app.path.clone().join("cities.csv");
     match path_to_cities.exists() {
         true => {}
@@ -78,6 +78,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
     }
 
     loop {
+        app.real_time = Local::now();
         terminal
             .draw(|f| ui(f, app))
             .map_err(|err| err.to_string())?;
@@ -112,9 +113,9 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                                             .await
                                             .map_err(|_| "Unable to get location".to_string())?,
                                     )
-                                    .await
-                                    .unwrap()
-                                    .current;
+                                        .await
+                                        .unwrap()
+                                        .current;
                                     app.location = app.location_input.clone()
                                 }
                                 app.location_input.clear();
