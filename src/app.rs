@@ -3,12 +3,12 @@ use crate::getting_location::{Location, get_location};
 use crate::getting_weather::{Current, get_url, get_weather};
 use crate::ui::ui;
 use battery::Manager;
+use chrono::{DateTime, Local};
 use crossterm::event::{KeyCode, KeyEventKind};
 use ratatui::Terminal;
 use ratatui::backend::Backend;
 use ratatui::crossterm::event::{self, Event};
 use std::path::PathBuf;
-use chrono::{DateTime, Local};
 
 #[derive(Debug)]
 pub enum Mode {
@@ -31,8 +31,7 @@ pub struct AppState {
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
-        
-        let battery = 
+        let battery =
             get_battery_level().map_err(|e| format!("Failed to get battery level: {}", e))?;
         if let Some(path) = getting_path() {
             Ok(AppState {
@@ -67,8 +66,6 @@ pub fn get_battery_level() -> Result<Vec<f32>, String> {
 }
 
 pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> Result<(), String> {
-
-    
     let path_to_cities = app.path.clone().join("cities.csv");
     match path_to_cities.exists() {
         true => {}
@@ -113,9 +110,9 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                                             .await
                                             .map_err(|_| "Unable to get location".to_string())?,
                                     )
-                                        .await
-                                        .unwrap()
-                                        .current;
+                                    .await
+                                    .unwrap()
+                                    .current;
                                     app.location = app.location_input.clone()
                                 }
                                 app.location_input.clear();
