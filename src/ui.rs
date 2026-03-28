@@ -115,10 +115,14 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .direction(Horizontal)
         .constraints([Constraint::Percentage(70), Constraint::Min(15)])
         .split(chunks[0]);
-    let _main_chunks = Layout::default()
+    let main_chunks = Layout::default()
         .direction(Horizontal)
         .constraints([Constraint::Percentage(60), Constraint::Percentage(40)])
         .split(chunks[1]);
+    let main_vertical_chunks = Layout::default()
+        .direction(Vertical)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(main_chunks[1]);
     let footer_chunks = Layout::default()
         .direction(Horizontal)
         .constraints([
@@ -144,9 +148,6 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg))
         .border_type(BorderType::Rounded);
-    //    let battery = Paragraph::new(Text::from(""))
-    //        .style(Style::default().fg(colors.fg))
-    //        .block(battery_block);
     let mut batteries = Vec::<ListItem>::new();
     if app.battery.is_empty() {
         frame.render_widget(location, chunks[0])
@@ -174,7 +175,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         frame.render_widget(list, header_chunks[1]);
         frame.render_widget(location, header_chunks[0]);
     }
-
+    // most of the blocks shode be there
     let main_block = Block::default()
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
@@ -205,6 +206,12 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title("Wind Direction")
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg));
+    let wind_block = Block::default()
+        .borders(Borders::ALL)
+        .border_type(BorderType::Rounded)
+        .title("Wind")
+        .title_alignment(Alignment::Center)
+        .style(Style::default().bg(colors.bg).fg(colors.fg));
     if let Some(weather) = app.weather.clone() {
         temp = weather.temperature_2m.to_string()
     }
@@ -229,6 +236,19 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             .into_centered_line(),
     ))
     .block(last_char_block);
+    let mut wind_spd = String::new();
+    let mut wind_dir = String::new();
+    if let Some(weather) = app.weather.clone() {
+        wind_dir = weather.wind_direction_10m.to_string();
+        wind_spd = weather.wind_speed_10m.to_string();
+    }
+    let wind_direction = Paragraph::new(Text::from(format!("wind direction: {}", wind_dir)))
+        .style(Style::default().fg(colors.fg))
+        .block(wind_direction_block);
+    let wind_spd = Paragraph::new(Text::from(format!("wind speed: {}", wind_spd)))
+        .style(Style::default().fg(colors.fg))
+        .block(wind_block);
+    // help info here
     match app.mode {
         Mode::Normal => {
             let cheat_sheet = Paragraph::new(
@@ -273,10 +293,13 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
     }
-    let _test = frame.area().height;
-    frame.render_widget(main, chunks[1]);
+    // some rendering
+    frame.render_widget(main, main_chunks[0]);
+    frame.render_widget(wind_spd, main_vertical_chunks[0]);
+    frame.render_widget(wind_direction, main_vertical_chunks[1]);
     frame.render_widget(last_char, footer_chunks[2]);
     frame.render_widget(time, footer_chunks[0]);
+    // popups go here
     match app.mode {
         Mode::Typing => {
             let typing_chunk = centered_rect(35, 35, frame.area());
@@ -315,10 +338,8 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         }
         _ => {}
     }
-
-    //frame.render_widget(battery, header_chunks[1]);
 }
-
+//popup Rect generator (this week warning is ment to be there )
 fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
     // Cut the given rectangle into three vertical pieces
     let popup_layout = Layout::default()

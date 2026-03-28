@@ -111,7 +111,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                                             .map_err(|_| "Unable to get location".to_string())?,
                                     )
                                     .await
-                                    .unwrap()
+                                    .expect(todo!("Add  handling bad internet connection"))
                                     .current;
                                     app.location = app.location_input.clone()
                                 }
