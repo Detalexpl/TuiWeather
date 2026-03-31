@@ -1,8 +1,41 @@
 use crate::getting_location::*;
 use serde::{Deserialize, Serialize};
+#[derive(Debug)]
+pub enum TemperatureUnits {
+    Celsius,
+    Fahrenheit,
+}
+#[derive(Debug)]
+pub enum WindUnits {
+    Knots,
+    Kmh,
+    Ms,
+    Mph
+}
+#[derive(Debug)]
+pub enum PrecipitationUnits {
+    Millimeter,
+    Inch,
+}
 #[derive(Debug, Deserialize, Serialize)]
 pub struct WeatherResponse {
     pub current: Option<Current>,
+}
+#[derive(Debug)]
+pub struct Units{
+    pub temperature: TemperatureUnits,
+    pub wind: WindUnits,
+    pub precipitation: PrecipitationUnits,
+}
+impl Units {
+
+    fn defaults() ->Units {
+        Units{
+            temperature: TemperatureUnits::Celsius,
+            wind: WindUnits::Knots,
+            precipitation: PrecipitationUnits::Millimeter,
+        }
+    }
 }
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Current {
