@@ -1,8 +1,8 @@
 use crate::app::{AppState, run};
 mod app;
-pub mod downloading;
-pub mod getting_location;
-pub mod getting_weather;
+mod downloading;
+mod getting_location;
+mod getting_weather;
 mod ui;
 
 #[tokio::main]

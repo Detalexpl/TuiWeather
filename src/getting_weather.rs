@@ -1,5 +1,8 @@
-use crate::getting_location::*;
+use crate::getting_location::Location;
+use crate::app::AppState;
 use serde::{Deserialize, Serialize};
+
+
 #[derive(Debug)]
 pub enum TemperatureUnits {
     Celsius,
@@ -29,7 +32,7 @@ pub struct Units{
 }
 impl Units {
 
-    fn defaults() ->Units {
+    pub fn defaults() ->Units {
         Units{
             temperature: TemperatureUnits::Celsius,
             wind: WindUnits::Knots,
@@ -56,10 +59,32 @@ pub struct Current {
 }
 
 //this function is yous to create api url
-pub async fn get_url(location: &Location) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn get_url(app: &AppState) -> Result<String, Box<dyn std::error::Error>> {
+    let mut _temperature_unit = String::new();
+    match app.units.temperature {
+        TemperatureUnits::Celsius => {_temperature_unit = String::from("celsius")}
+        TemperatureUnits::Fahrenheit => {_temperature_unit = String::from("fahrenheit")}
+    }
+    let mut _wind_speed_unit = String::new();
+    match app.units.wind {
+        WindUnits::Ms => _wind_speed_unit = String::from("ms"),
+        WindUnits::Kmh => _wind_speed_unit = String::from("kmh"),
+
+        WindUnits::Mph => _wind_speed_unit = String::from("mph"),
+        WindUnits::Knots => _wind_speed_unit = String::from("kn"),
+    }
+    let mut _precipitation =String::new();
+    match app.units.precipitation {
+        PrecipitationUnits::Inch => _precipitation = String::from("inch"),
+        PrecipitationUnits::Millimeter => _precipitation = String::from("mm"),
+    }
     let url = format!(
-        "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&current=temperature_2m,is_day,rain,showers,weather_code,cloud_cover,snowfall,pressure_msl,surface_pressure,wind_speed_10m,relative_humidity_2m,wind_direction_10m&timezone=auto",
-        location.latitude, location.longitude
+        "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&current=temperature_2m,is_day,rain,showers,weather_code,cloud_cover,snowfall,pressure_msl,surface_pressure,wind_speed_10m,relative_humidity_2m,wind_direction_10m&timezone=auto&wind_speed_unit={}&temperature_unit={}&precipitation_unit={}",
+        app.valid_location.clone().unwrap().latitude,
+        app.valid_location.clone().unwrap().longitude,
+        _wind_speed_unit,
+        _temperature_unit,
+        _precipitation
     );
     Ok(url)
 }
@@ -74,15 +99,17 @@ mod tests {
     use super::*;
     #[tokio::test]
     async fn get_url_test() {
+        let mut app_state = AppState::new().unwrap();
         let location = Location {
             latitude: 52.222,
             longitude: 21.01,
         };
-        let url = get_url(&location).await.unwrap();
+        app_state.valid_location = Some(location);
+        let url = get_url(&app_state).await.unwrap();
 
         assert_eq!(
             url,
-            "https://api.open-meteo.com/v1/forecast?latitude=52.222&longitude=21.01&current=temperature_2m,is_day,rain,showers,weather_code,cloud_cover,snowfall,pressure_msl,surface_pressure,wind_speed_10m,relative_humidity_2m,wind_direction_10m&timezone=auto"
+            "https://api.open-meteo.com/v1/forecast?latitude=52.222&longitude=21.01&current=temperature_2m,is_day,rain,showers,weather_code,cloud_cover,snowfall,pressure_msl,surface_pressure,wind_speed_10m,relative_humidity_2m,wind_direction_10m&timezone=auto&wind_speed_unit=kn&temperature_unit=celsius&precipitation_unit=mm"
         );
     }
 }

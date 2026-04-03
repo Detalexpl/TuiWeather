@@ -1,6 +1,6 @@
 use crate::downloading::{downloading_data, getting_path};
 use crate::getting_location::{Location, get_location};
-use crate::getting_weather::{Current, get_url, get_weather};
+use crate::getting_weather::{Current, get_url, get_weather, Units};
 use crate::ui::ui;
 use battery::Manager;
 use chrono::{DateTime, Local};
@@ -25,9 +25,9 @@ pub struct AppState {
     pub path: PathBuf,
     pub weather: Option<Current>,
     pub battery: Vec<f32>,
-    //pub tester: bool,
     pub last_char: char,
     pub real_time: DateTime<Local>,
+    pub units: Units,
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
@@ -44,6 +44,7 @@ impl AppState {
                 battery,
                 last_char: ' ', //tester: true,
                 real_time: Local::now(),
+                units : Units::defaults()
             })
         } else {
             Err("unable to get path".into())
@@ -106,12 +107,12 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                                         .map_err(|_| "Unable to get location".to_string())?;
                                 if let Some(location) = &app.valid_location {
                                     app.weather = get_weather(
-                                        get_url(location)
+                                        get_url(&app)
                                             .await
                                             .map_err(|_| "Unable to get location".to_string())?,
                                     )
                                     .await
-                                    .expect(todo!("Add  handling bad internet connection"))
+                                    .expect("Add  handling bad internet connection")
                                     .current;
                                     app.location = app.location_input.clone()
                                 }
@@ -135,7 +136,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     KeyCode::Char('r') => {
                         match &app.valid_location {
                             Some(location) => {
-                                if let Ok(url) = get_url(&location).await {
+                                if let Ok(url) = get_url(&app).await {
                                     app.weather =
                                         get_weather(url).await.map_err(|e| e.to_string())?.current;
                                 } else {
