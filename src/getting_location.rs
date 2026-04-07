@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::path::PathBuf;
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct Location {
     pub latitude: f64,
     pub longitude: f64,

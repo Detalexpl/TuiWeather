@@ -1,6 +1,6 @@
 use crate::downloading::{downloading_data, getting_path};
 use crate::getting_location::{Location, get_location};
-use crate::getting_weather::{Current, get_url, get_weather, Units};
+use crate::getting_weather::{Current, Units, get_url, get_weather};
 use crate::ui::ui;
 use battery::Manager;
 use chrono::{DateTime, Local};
@@ -15,6 +15,7 @@ pub enum Mode {
     Normal,
     Typing,
     Exiting,
+    Settings,
 }
 #[derive(Debug)]
 pub struct AppState {
@@ -28,6 +29,10 @@ pub struct AppState {
     pub last_char: char,
     pub real_time: DateTime<Local>,
     pub units: Units,
+    pub master_tab_selection: u128,
+    pub settings_tab_1_selection :u128,
+    pub settings_tab_2_selection :u128,
+    pub settings_tab_3_selection :u128,
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
@@ -44,7 +49,11 @@ impl AppState {
                 battery,
                 last_char: ' ', //tester: true,
                 real_time: Local::now(),
-                units : Units::defaults()
+                units: Units::defaults(),
+                master_tab_selection:3,
+                settings_tab_1_selection: 2,
+                settings_tab_2_selection: 4,
+                settings_tab_3_selection: 2,
             })
         } else {
             Err("unable to get path".into())
@@ -105,7 +114,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                                 app.valid_location =
                                     get_location(&path_to_cities, &app.location_input)
                                         .map_err(|_| "Unable to get location".to_string())?;
-                                if let Some(location) = &app.valid_location {
+                                if let Some(_) = &app.valid_location {
                                     app.weather = get_weather(
                                         get_url(&app)
                                             .await
@@ -135,7 +144,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     }
                     KeyCode::Char('r') => {
                         match &app.valid_location {
-                            Some(location) => {
+                            Some(_) => {
                                 if let Ok(url) = get_url(&app).await {
                                     app.weather =
                                         get_weather(url).await.map_err(|e| e.to_string())?.current;
@@ -148,6 +157,9 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
 
                         app.battery = get_battery_level()
                             .map_err(|_| "unable to get battery info".to_string())?;
+                    },
+                    KeyCode::Char('w') => {
+                        app.mode = Mode::Settings;
                     }
                     _ => {}
                 },
@@ -158,6 +170,39 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     }
                     _ => {}
                 },
+                Mode::Settings => match key.code {
+                    KeyCode::Char('j') => {
+                        app.master_tab_selection = app.master_tab_selection + 2;
+                    }
+                    KeyCode::Char('k') => {
+                        app.master_tab_selection = app.master_tab_selection + 2;
+                    }
+                    KeyCode::Char('h') => {
+                        let tab = app.master_tab_selection % 3;
+                        match tab {
+                            0 => {
+                                app.settings_tab_1_selection = app.settings_tab_1_selection + 1;
+                            }
+                            1 => {
+                                app.settings_tab_2_selection = app.settings_tab_2_selection + 3;
+                            }
+                            2 => {
+                                app.settings_tab_3_selection = app.settings_tab_3_selection + 1;
+                            }
+                            _ => {}
+                        }
+                    }
+                    KeyCode::Char('l') => {
+                        let tab = app.master_tab_selection % 3;
+                        match tab {
+                            0 => { app.settings_tab_1_selection = app.settings_tab_1_selection + 1; }
+                            1 => { app.settings_tab_2_selection = app.settings_tab_2_selection + 1; }
+                            2 => { app.settings_tab_3_selection = app.settings_tab_3_selection + 1; }
+                            _ => {}
+                        }
+                    }
+                    _ => {}
+                }
             }
         }
     }

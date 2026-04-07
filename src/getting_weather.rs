@@ -1,7 +1,6 @@
-use crate::getting_location::Location;
 use crate::app::AppState;
+use crate::getting_location::Location;
 use serde::{Deserialize, Serialize};
-
 
 #[derive(Debug)]
 pub enum TemperatureUnits {
@@ -13,7 +12,7 @@ pub enum WindUnits {
     Knots,
     Kmh,
     Ms,
-    Mph
+    Mph,
 }
 #[derive(Debug)]
 pub enum PrecipitationUnits {
@@ -25,15 +24,14 @@ pub struct WeatherResponse {
     pub current: Option<Current>,
 }
 #[derive(Debug)]
-pub struct Units{
+pub struct Units {
     pub temperature: TemperatureUnits,
     pub wind: WindUnits,
     pub precipitation: PrecipitationUnits,
 }
 impl Units {
-
-    pub fn defaults() ->Units {
-        Units{
+    pub fn defaults() -> Units {
+        Units {
             temperature: TemperatureUnits::Celsius,
             wind: WindUnits::Knots,
             precipitation: PrecipitationUnits::Millimeter,
@@ -62,8 +60,8 @@ pub struct Current {
 pub async fn get_url(app: &AppState) -> Result<String, Box<dyn std::error::Error>> {
     let mut _temperature_unit = String::new();
     match app.units.temperature {
-        TemperatureUnits::Celsius => {_temperature_unit = String::from("celsius")}
-        TemperatureUnits::Fahrenheit => {_temperature_unit = String::from("fahrenheit")}
+        TemperatureUnits::Celsius => _temperature_unit = String::from("celsius"),
+        TemperatureUnits::Fahrenheit => _temperature_unit = String::from("fahrenheit"),
     }
     let mut _wind_speed_unit = String::new();
     match app.units.wind {
@@ -73,7 +71,7 @@ pub async fn get_url(app: &AppState) -> Result<String, Box<dyn std::error::Error
         WindUnits::Mph => _wind_speed_unit = String::from("mph"),
         WindUnits::Knots => _wind_speed_unit = String::from("kn"),
     }
-    let mut _precipitation =String::new();
+    let mut _precipitation = String::new();
     match app.units.precipitation {
         PrecipitationUnits::Inch => _precipitation = String::from("inch"),
         PrecipitationUnits::Millimeter => _precipitation = String::from("mm"),

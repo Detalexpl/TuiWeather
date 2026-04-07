@@ -292,6 +292,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
+        Mode::Settings => {}
     }
     // some rendering
     frame.render_widget(main, main_chunks[0]);
@@ -335,6 +336,10 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             .block(exiting_block);
             frame.render_widget(Clear, exiting_chunk);
             frame.render_widget(exiting, exiting_chunk);
+        }
+        Mode::Settings => {
+            let settings_chunk = centered_rect(60, 60, frame.area());
+            
         }
         _ => {}
     }
