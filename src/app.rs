@@ -30,9 +30,9 @@ pub struct AppState {
     pub real_time: DateTime<Local>,
     pub units: Units,
     pub master_tab_selection: u128,
-    pub settings_tab_1_selection :u128,
-    pub settings_tab_2_selection :u128,
-    pub settings_tab_3_selection :u128,
+    pub settings_tab_1_selection: u128,
+    pub settings_tab_2_selection: u128,
+    pub settings_tab_3_selection: u128,
 }
 impl AppState {
     pub fn new() -> Result<Self, String> {
@@ -50,7 +50,7 @@ impl AppState {
                 last_char: ' ', //tester: true,
                 real_time: Local::now(),
                 units: Units::defaults(),
-                master_tab_selection:3,
+                master_tab_selection: 3,
                 settings_tab_1_selection: 2,
                 settings_tab_2_selection: 4,
                 settings_tab_3_selection: 2,
@@ -157,7 +157,7 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
 
                         app.battery = get_battery_level()
                             .map_err(|_| "unable to get battery info".to_string())?;
-                    },
+                    }
                     KeyCode::Char('w') => {
                         app.mode = Mode::Settings;
                     }
@@ -195,14 +195,20 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     KeyCode::Char('l') => {
                         let tab = app.master_tab_selection % 3;
                         match tab {
-                            0 => { app.settings_tab_1_selection = app.settings_tab_1_selection + 1; }
-                            1 => { app.settings_tab_2_selection = app.settings_tab_2_selection + 1; }
-                            2 => { app.settings_tab_3_selection = app.settings_tab_3_selection + 1; }
+                            0 => {
+                                app.settings_tab_1_selection = app.settings_tab_1_selection + 1;
+                            }
+                            1 => {
+                                app.settings_tab_2_selection = app.settings_tab_2_selection + 1;
+                            }
+                            2 => {
+                                app.settings_tab_3_selection = app.settings_tab_3_selection + 1;
+                            }
                             _ => {}
                         }
                     }
                     _ => {}
-                }
+                },
             }
         }
     }

@@ -1,12 +1,11 @@
 use crate::app::{AppState, Mode};
-
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::prelude::Stylize;
 use ratatui::style::{Color, Style};
 use ratatui::text::{Line, Span, Text};
-use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph};
+use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph, Tabs};
 
 struct ColorPalette {
     bg: Color,
@@ -338,8 +337,41 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             frame.render_widget(exiting, exiting_chunk);
         }
         Mode::Settings => {
-            let settings_chunk = centered_rect(60, 60, frame.area());
-            
+            let settings_chunk = Layout::default()
+                .direction(Vertical)
+                .constraints([
+                    Constraint::Ratio(1, 3),
+                    Constraint::Ratio(1, 3),
+                    Constraint::Ratio(1, 3),
+                ])
+                .split(centered_rect(60, 60, frame.area()));
+            let master_tab: u8 = (app.master_tab_selection % 3) as u8;
+            let temperature_tab_n:u8 =(app.settings_tab_1_selection % 2) as u8;
+            let wind_speed_tab_n:u8 =(app.settings_tab_2_selection % 4) as u8;
+            let precipitation_tab_n:u8 =(app.settings_tab_3_selection % 2) as u8;
+            let temperature_tab = Tabs::new([
+                    "Celsius",
+                    "Farenchite"
+                ])
+            match master_tab {
+                0 => {
+                    //making blocks
+                    //first block will be showing temperature
+                    let selected_block = selected_block("temperature", &colors);
+                    //second block will be showing wind speed
+                    let second_block = unselected_block("wind speed");
+                    // this block will be displaying precipitation
+                    let third_block = unselected_block("precipitation");
+
+                }
+                1 => {}
+                2 => {}
+                // this won't happen
+                _ => {
+                    ratatui::restore();
+                    panic!("error while showing settings popup")
+                }
+            }
         }
         _ => {}
     }
@@ -365,4 +397,20 @@ fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
             Constraint::Percentage((100 - percent_x) / 2),
         ])
         .split(popup_layout[1])[1] // Return the middle chunk
+}
+fn selected_block<'a>(title: &'a str, colors: &'a ColorPalette) -> Block<'a> {
+    Block::default()
+        .title(title)
+        .title_alignment(Alignment::Center)
+        .borders(Borders::ALL)
+        .border_type(BorderType::HeavyTripleDashed)
+        .style(Style::default().bg(colors.bg))
+}
+fn unselected_block(title: &str) -> Block {
+    Block::default()
+        .title(title)
+        .title_alignment(Alignment::Center)
+        .borders(Borders::ALL)
+        .border_type(BorderType::LightTripleDashed)
+        .style(Style::default().bg(Color::Black))
 }
