@@ -1,5 +1,4 @@
 use crate::app::AppState;
-use crate::getting_location::Location;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -94,6 +93,7 @@ pub async fn get_weather(url: String) -> Result<WeatherResponse, Box<dyn std::er
 
 #[cfg(test)]
 mod tests {
+    use crate::getting_location::Location;
     use super::*;
     #[tokio::test]
     async fn get_url_test() {

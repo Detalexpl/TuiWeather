@@ -481,7 +481,7 @@ fn selected_block<'a>(title: &'a str, colors: &'a ColorPalette) -> Block<'a> {
         .border_type(BorderType::HeavyTripleDashed)
         .style(Style::default().bg(colors.bg))
 }
-fn unselected_block(title: &str) -> Block {
+fn unselected_block(title: &str) -> Block<'_> {
     Block::default()
         .title(title)
         .title_alignment(Alignment::Center)
