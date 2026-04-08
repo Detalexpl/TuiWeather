@@ -337,22 +337,36 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             frame.render_widget(exiting, exiting_chunk);
         }
         Mode::Settings => {
+            let rect = centered_rect(60, 60, frame.area());
+            let settings_rect = Rect{
+                x: rect.x +1,
+                y: rect.y +1,
+                height: rect.height - 2,
+                width: rect.width - 2,
+            };
             let settings_chunk = Layout::default()
                 .direction(Vertical)
                 .constraints([
-                    Constraint::Ratio(1, 3),
-                    Constraint::Ratio(1, 3),
-                    Constraint::Ratio(1, 3),
+                    Constraint::Fill(1),
+                    Constraint::Length(3),
+                    Constraint::Fill(1),
+                    Constraint::Length(3),
+                    Constraint::Fill(1),
+                    Constraint::Length(3),
+                    Constraint::Fill(1),
                 ])
-                .split(centered_rect(60, 60, frame.area()));
-            let master_tab: u8 = (app.master_tab_selection % 3) as u8;
-            let temperature_tab_n:u8 =(app.settings_tab_1_selection % 2) as u8;
-            let wind_speed_tab_n:u8 =(app.settings_tab_2_selection % 4) as u8;
-            let precipitation_tab_n:u8 =(app.settings_tab_3_selection % 2) as u8;
-            let temperature_tab = Tabs::new([
-                    "Celsius",
-                    "Farenchite"
-                ])
+                .split(settings_rect);
+            frame.render_widget(Clear, centered_rect(60, 60, frame.area()));
+            let master_tab: usize = (app.master_tab_selection % 3) as usize;
+            let temperature_tab_n: usize = (app.settings_tab_1_selection % 2) as usize;
+            let wind_speed_tab_n: usize = (app.settings_tab_2_selection % 4) as usize;
+            let precipitation_tab_n: usize = (app.settings_tab_3_selection % 2) as usize;
+            let settings_block = Block::default()
+            .borders(Borders::ALL)
+            .title("Settings")
+            .title_alignment(Alignment::Center)
+            .style(Style::default().bg(Color::Rgb(50,50,50)));
+            frame.render_widget(settings_block, centered_rect(60,60,frame.area()));
             match master_tab {
                 0 => {
                     //making blocks
@@ -362,10 +376,71 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                     let second_block = unselected_block("wind speed");
                     // this block will be displaying precipitation
                     let third_block = unselected_block("precipitation");
-
+                    let temperature_tab = Tabs::new(vec!["Celsius", "Fahrenheit"])
+                        .select(temperature_tab_n)
+                        .block(selected_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    let wind_speed_tab = Tabs::new(vec!["Knots", "km/h", "m/s", "mph"])
+                        .select(wind_speed_tab_n)
+                        .block(second_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    let precipitation_tab = Tabs::new(vec!["Millimeter", "Inch"])
+                        .select(precipitation_tab_n)
+                        .block(third_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    frame.render_widget(temperature_tab, settings_chunk[1]);
+                    frame.render_widget(wind_speed_tab, settings_chunk[3]);
+                    frame.render_widget(precipitation_tab, settings_chunk[5]);
                 }
-                1 => {}
-                2 => {}
+                1 => {
+                    let first_block = unselected_block("temperature");
+                    let selected_block = selected_block("wind speed", &colors);
+                    let third_block = unselected_block("precipitation");
+                    let temperature_tab = Tabs::new(vec!["Celsius", "Fahrenheit"])
+                        .select(temperature_tab_n)
+                        .block(first_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    let wind_speed_tab = Tabs::new(["Knots", "km/h", "m/s", "mph"])
+                        .select(wind_speed_tab_n)
+                        .block(selected_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    let precipitation_tab = Tabs::new(["Millimeter", "Inch"])
+                        .select(precipitation_tab_n)
+                        .block(third_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    frame.render_widget(temperature_tab, settings_chunk[1]);
+                    frame.render_widget(wind_speed_tab, settings_chunk[3]);
+                    frame.render_widget(precipitation_tab, settings_chunk[5]);
+                }
+                2 => {
+                    let first_block = unselected_block("temperature");
+                    let second_block = unselected_block("wind speed");
+                    let selected_block = selected_block("precipitation", &colors);
+                    let temperature_tab = Tabs::new(vec!["Celsius", "Fahrenheit"])
+                        .select(temperature_tab_n)
+                        .block(first_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    let wind_speed_tab = Tabs::new(["Knots", "km/h", "m/s", "mph"])
+                        .select(wind_speed_tab_n)
+                        .block(second_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    let precipitation_tab = Tabs::new(["Millimeter", "Inch"])
+                        .select(precipitation_tab_n)
+                        .block(selected_block)
+                        .padding("  ", "  ")
+                        .highlight_style(Style::default().magenta().on_black().bold());
+                    frame.render_widget(temperature_tab, settings_chunk[1]);
+                    frame.render_widget(wind_speed_tab, settings_chunk[3]);
+                    frame.render_widget(precipitation_tab, settings_chunk[5]);
+                }
                 // this won't happen
                 _ => {
                     ratatui::restore();

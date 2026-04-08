@@ -1,6 +1,8 @@
 use crate::downloading::{downloading_data, getting_path};
 use crate::getting_location::{Location, get_location};
-use crate::getting_weather::{Current, Units, get_url, get_weather};
+use crate::getting_weather::{
+    Current, PrecipitationUnits, TemperatureUnits, Units, WindUnits, get_url, get_weather,
+};
 use crate::ui::ui;
 use battery::Manager;
 use chrono::{DateTime, Local};
@@ -170,45 +172,85 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     }
                     _ => {}
                 },
-                Mode::Settings => match key.code {
-                    KeyCode::Char('j') => {
-                        app.master_tab_selection = app.master_tab_selection + 2;
+                Mode::Settings => {
+                    match key.code {
+                        KeyCode::Char('j') | KeyCode::Up => {
+                            app.master_tab_selection = app.master_tab_selection + 2;
+                        }
+                        KeyCode::Char('k') | KeyCode::Down => {
+                            app.master_tab_selection = app.master_tab_selection + 1;
+                        }
+                        KeyCode::Char('h') | KeyCode::Left => {
+                            let tab = app.master_tab_selection % 3;
+                            match tab {
+                                0 => {
+                                    app.settings_tab_1_selection = app.settings_tab_1_selection + 1;
+                                }
+                                1 => {
+                                    app.settings_tab_2_selection = app.settings_tab_2_selection + 3;
+                                }
+                                2 => {
+                                    app.settings_tab_3_selection = app.settings_tab_3_selection + 1;
+                                }
+                                _ => {}
+                            }
+                        }
+                        KeyCode::Char('l') | KeyCode::Right => {
+                            let tab = app.master_tab_selection % 3;
+                            match tab {
+                                0 => {
+                                    app.settings_tab_1_selection = app.settings_tab_1_selection + 1;
+                                }
+                                1 => {
+                                    app.settings_tab_2_selection = app.settings_tab_2_selection + 1;
+                                }
+                                2 => {
+                                    app.settings_tab_3_selection = app.settings_tab_3_selection + 1;
+                                }
+                                _ => {}
+                            }
+                        }
+                        KeyCode::Esc => {
+                            app.mode = Mode::Normal;
+                        }
+                        _ => {}
                     }
-                    KeyCode::Char('k') => {
-                        app.master_tab_selection = app.master_tab_selection + 2;
-                    }
-                    KeyCode::Char('h') => {
-                        let tab = app.master_tab_selection % 3;
-                        match tab {
-                            0 => {
-                                app.settings_tab_1_selection = app.settings_tab_1_selection + 1;
-                            }
-                            1 => {
-                                app.settings_tab_2_selection = app.settings_tab_2_selection + 3;
-                            }
-                            2 => {
-                                app.settings_tab_3_selection = app.settings_tab_3_selection + 1;
-                            }
-                            _ => {}
+                    let temperature_selection = (app.settings_tab_1_selection % 2) as usize;
+                    let wind_speed_selection = (app.settings_tab_2_selection % 4) as usize;
+                    let precipitation_selection = (app.settings_tab_3_selection % 2) as usize;
+                    let temperature_unit: TemperatureUnits;
+                    let wind_speed_unit: WindUnits;
+                    let precipitation_unit: PrecipitationUnits;
+                    match temperature_selection {
+                        0 => {
+                            temperature_unit = TemperatureUnits::Celsius;
+                        }
+                        1 => {
+                            temperature_unit = TemperatureUnits::Fahrenheit;
+                        }
+                        _ => {
+                            temperature_unit = TemperatureUnits::Celsius;
                         }
                     }
-                    KeyCode::Char('l') => {
-                        let tab = app.master_tab_selection % 3;
-                        match tab {
-                            0 => {
-                                app.settings_tab_1_selection = app.settings_tab_1_selection + 1;
-                            }
-                            1 => {
-                                app.settings_tab_2_selection = app.settings_tab_2_selection + 1;
-                            }
-                            2 => {
-                                app.settings_tab_3_selection = app.settings_tab_3_selection + 1;
-                            }
-                            _ => {}
-                        }
+                    match wind_speed_selection {
+                        0 => wind_speed_unit = WindUnits::Knots,
+                        1 => wind_speed_unit = WindUnits::Kmh,
+                        2 => wind_speed_unit = WindUnits::Ms,
+                        3 => wind_speed_unit = WindUnits::Mph,
+                        _ => wind_speed_unit = WindUnits::Knots,
                     }
-                    _ => {}
-                },
+                    match precipitation_selection {
+                        0 => precipitation_unit = PrecipitationUnits::Millimeter,
+                        1 => precipitation_unit = PrecipitationUnits::Inch,
+                        _ => precipitation_unit = PrecipitationUnits::Millimeter,
+                    }
+                    let selected_units = Units {
+                        wind: wind_speed_unit,
+                        temperature: temperature_unit,
+                        precipitation: precipitation_unit,
+                    };
+                    app.units = selected_units;
+                }
             }
         }
     }

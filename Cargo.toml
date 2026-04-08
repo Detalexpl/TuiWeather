@@ -1,6 +1,6 @@
 [package]
 name = "TuiWeather"
-version = "0.2.24-not-working"
+version = "0.2.24"
 edition = "2024"
 license = "MIT"
 description = "Simple Tui app for showing weather"
