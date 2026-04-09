@@ -3,7 +3,7 @@ use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::prelude::Stylize;
-use ratatui::style::{Color, Style};
+use ratatui::style::{Color, Style, Styled};
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph, Tabs};
 
@@ -211,17 +211,18 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title("Wind")
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg));
+    let mut main:Paragraph;
     if let Some(weather) = app.weather.clone() {
-        temp = weather.temperature_2m.to_string()
+        temp = weather.temperature_2m.to_string();
+        main = Paragraph::new(Line::from(vec![
+            "temperature: ".into()
+        ]).centered()).style(Style::default().fg(colors.fg).bg(colors.bg));
+    } else {
+        main = Paragraph::new(Line::from(vec!["No Weather data".into()]).centered())
+            .style(Style::default().fg(colors.fg).bg(colors.bg))
+            .block(main_block);
     }
-    let main = Paragraph::new(Text::from(Span::styled(
-        format!("temp: {}", temp),
-        Style::default().fg(colors.fg),
-    )))
-    .centered()
-    .style(Style::default().fg(colors.fg))
-    .block(main_block)
-    .centered();
+
     let time = Paragraph::new(Line::from(vec![
         app.real_time
             .format("%d/%m/%y  %H:%M")
