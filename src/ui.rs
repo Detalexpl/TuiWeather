@@ -150,6 +150,7 @@ impl UnitsSymbols {
 }
 
 pub fn ui(frame: &mut Frame, app: &mut AppState) {
+    let unit_symbols = UnitsSymbols::get_units(app);
     let colors = ColorPalette::get_colors(&app);
     //this part of code is used to reate Layout
     let chunks = Layout::default()
@@ -248,7 +249,6 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title_alignment(Alignment::Center)
         .bg(colors.bg)
         .fg(colors.fg);
-    let mut temp = String::from("");
     let wind_direction_block = Block::default()
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
@@ -263,10 +263,32 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .style(Style::default().bg(colors.bg).fg(colors.fg));
     let mut main: Paragraph;
     if let Some(weather) = app.weather.clone() {
-        temp = weather.temperature_2m.to_string();
-        main =
-            Paragraph::new(Line::from(vec!["temperature: ".into(), temp.fg(colors.fg)]).centered())
-                .style(Style::default().fg(colors.fg).bg(colors.bg));
+        let temp = weather.temperature_2m.to_string();
+        let rain = weather.rain.to_string();
+        let snow = weather.snowfall.to_string();
+        let lines = vec![
+            Line::from(vec![
+                "temperature: ".fg(colors.fg),
+                temp.fg(colors.fg),
+                unit_symbols.temperature.clone().fg(colors.fg),
+            ])
+            .centered(),
+            Line::from(vec![
+                "rain: ".fg(colors.fg),
+                rain.fg(colors.fg),
+                unit_symbols.precipitation.clone().fg(colors.fg),
+            ])
+            .centered(),
+            Line::from(vec![
+                "snowfall: ".fg(colors.fg),
+                snow.fg(colors.fg),
+                unit_symbols.precipitation.clone().fg(colors.fg),
+            ])
+            .centered(),
+        ];
+        main = Paragraph::new(Text::from(lines))
+            .style(Style::default().fg(colors.fg).bg(colors.bg))
+            .block(main_block);
     } else {
         main = Paragraph::new(Line::from(vec!["No Weather data".into()]).centered())
             .style(Style::default().fg(colors.fg).bg(colors.bg))
@@ -413,7 +435,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             frame.render_widget(exiting, exiting_chunk);
         }
         Mode::Settings => {
-            let rect = centered_rect(60, 60, frame.area());
+            let rect = centered_rect(45, 30, frame.area());
             let settings_rect = Rect {
                 x: rect.x + 1,
                 y: rect.y + 1,
@@ -423,16 +445,16 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             let settings_chunk = Layout::default()
                 .direction(Vertical)
                 .constraints([
-                    Constraint::Fill(1),
+                    Constraint::Fill(2),
                     Constraint::Length(3),
                     Constraint::Fill(1),
                     Constraint::Length(3),
                     Constraint::Fill(1),
                     Constraint::Length(3),
-                    Constraint::Fill(1),
+                    Constraint::Fill(2),
                 ])
                 .split(settings_rect);
-            frame.render_widget(Clear, centered_rect(60, 60, frame.area()));
+            frame.render_widget(Clear, centered_rect(45, 30, frame.area()));
             let master_tab: usize = (app.master_tab_selection % 3) as usize;
             let temperature_tab_n: usize = (app.settings_tab_1_selection % 2) as usize;
             let wind_speed_tab_n: usize = (app.settings_tab_2_selection % 4) as usize;
@@ -442,7 +464,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                 .title("Settings")
                 .title_alignment(Alignment::Center)
                 .style(Style::default().bg(Color::Rgb(50, 50, 50)));
-            frame.render_widget(settings_block, centered_rect(60, 60, frame.area()));
+            frame.render_widget(settings_block, centered_rect(45, 30, frame.area()));
             match master_tab {
                 0 => {
                     //making blocks
