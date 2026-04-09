@@ -1,6 +1,6 @@
 use crate::downloading::{downloading_data, getting_path};
 use crate::getting_location::{Location, get_location};
-use crate::getting_weather::{
+pub use crate::getting_weather::{
     Current, PrecipitationUnits, TemperatureUnits, Units, WindUnits, get_url, get_weather,
 };
 use crate::ui::ui;

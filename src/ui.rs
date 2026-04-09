@@ -1,4 +1,7 @@
 use crate::app::{AppState, Mode};
+use crate::getting_weather::PrecipitationUnits;
+use crate::getting_weather::TemperatureUnits;
+use crate::getting_weather::WindUnits;
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
@@ -95,6 +98,53 @@ impl ColorPalette {
                 bg: Color::default(),
                 fg: Color::default(),
             }
+        }
+    }
+}
+struct UnitsSymbols {
+    temperature: String,
+    wind_speed: String,
+    precipitation: String,
+}
+impl UnitsSymbols {
+    pub fn get_units(app: &AppState) -> UnitsSymbols {
+        let mut temperature = String::new();
+        let mut wind_speed = String::new();
+        let mut precipitation = String::new();
+        match app.units.temperature {
+            TemperatureUnits::Celsius => {
+                temperature = String::from("°C");
+            }
+            TemperatureUnits::Fahrenheit => {
+                temperature = String::from("°F");
+            }
+        }
+        match app.units.wind {
+            WindUnits::Knots => {
+                wind_speed = String::from("kt");
+            }
+            WindUnits::Kmh => {
+                wind_speed = String::from("km/h");
+            }
+            WindUnits::Ms => {
+                wind_speed = String::from("m/s");
+            }
+            WindUnits::Mph => {
+                wind_speed = String::from("mi/h");
+            }
+        }
+        match app.units.precipitation {
+            PrecipitationUnits::Millimeter => {
+                precipitation = String::from("mm");
+            }
+            PrecipitationUnits::Inch => {
+                precipitation = String::from("in");
+            }
+        }
+        UnitsSymbols {
+            temperature,
+            wind_speed,
+            precipitation,
         }
     }
 }
@@ -211,12 +261,12 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title("Wind")
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg));
-    let mut main:Paragraph;
+    let mut main: Paragraph;
     if let Some(weather) = app.weather.clone() {
         temp = weather.temperature_2m.to_string();
-        main = Paragraph::new(Line::from(vec![
-            "temperature: ".into()
-        ]).centered()).style(Style::default().fg(colors.fg).bg(colors.bg));
+        main =
+            Paragraph::new(Line::from(vec!["temperature: ".into(), temp.fg(colors.fg)]).centered())
+                .style(Style::default().fg(colors.fg).bg(colors.bg));
     } else {
         main = Paragraph::new(Line::from(vec!["No Weather data".into()]).centered())
             .style(Style::default().fg(colors.fg).bg(colors.bg))
