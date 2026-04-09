@@ -258,6 +258,9 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                     "Search location ".fg(colors.fg),
                     "<S>".fg(Color::Rgb(155, 0, 255)),
                     "   ".into(),
+                    "Settings ".fg(colors.fg),
+                    "<W>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
                     "Quit ".fg(colors.fg),
                     "<Q>".fg(Color::Rgb(255, 50, 50)),
                 ])
@@ -291,7 +294,29 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
-        Mode::Settings => {}
+        Mode::Settings => {
+            let cheat_sheet = Paragraph::new(
+                Line::from(vec![
+                    "Up ".fg(colors.fg),
+                    "<J>/<UP>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
+                    "Down ".fg(colors.fg),
+                    "<K>/<DOWN>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
+                    "Left ".fg(colors.fg),
+                    "<H>/<LEFT>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
+                    "Right ".fg(colors.fg),
+                    "<L>/<RIGHT>".fg(Color::Rgb(155, 0, 255)),
+                    "   ".into(),
+                    "Exit ".fg(colors.fg),
+                    "<ESC>".fg(Color::Rgb(155, 0, 255)),
+                ])
+                .centered(),
+            )
+            .block(cheat_sheet_block);
+            frame.render_widget(cheat_sheet, footer_chunks[1]);
+        }
     }
     // some rendering
     frame.render_widget(main, main_chunks[0]);
@@ -338,9 +363,9 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         }
         Mode::Settings => {
             let rect = centered_rect(60, 60, frame.area());
-            let settings_rect = Rect{
-                x: rect.x +1,
-                y: rect.y +1,
+            let settings_rect = Rect {
+                x: rect.x + 1,
+                y: rect.y + 1,
                 height: rect.height - 2,
                 width: rect.width - 2,
             };
@@ -362,11 +387,11 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             let wind_speed_tab_n: usize = (app.settings_tab_2_selection % 4) as usize;
             let precipitation_tab_n: usize = (app.settings_tab_3_selection % 2) as usize;
             let settings_block = Block::default()
-            .borders(Borders::ALL)
-            .title("Settings")
-            .title_alignment(Alignment::Center)
-            .style(Style::default().bg(Color::Rgb(50,50,50)));
-            frame.render_widget(settings_block, centered_rect(60,60,frame.area()));
+                .borders(Borders::ALL)
+                .title("Settings")
+                .title_alignment(Alignment::Center)
+                .style(Style::default().bg(Color::Rgb(50, 50, 50)));
+            frame.render_widget(settings_block, centered_rect(60, 60, frame.area()));
             match master_tab {
                 0 => {
                     //making blocks
