@@ -117,14 +117,13 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                                     get_location(&path_to_cities, &app.location_input)
                                         .map_err(|_| "Unable to get location".to_string())?;
                                 if let Some(_) = &app.valid_location {
-                                    app.weather = get_weather(
-                                        get_url(&app)
-                                            .await
-                                            .map_err(|_| "Unable to get location".to_string())?,
-                                    )
-                                    .await
-                                    .expect("Add  handling bad internet connection")
-                                    .current;
+                                    if let Ok(url) = get_url(&app).await {
+                                        if let Ok(weather) = get_weather(url).await {
+                                            app.weather = Some(weather.current.unwrap());
+                                        } else {
+                                            app.weather = None;
+                                        }
+                                    }
                                     app.location = app.location_input.clone()
                                 }
                                 app.location_input.clear();
@@ -148,10 +147,11 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                         match &app.valid_location {
                             Some(_) => {
                                 if let Ok(url) = get_url(&app).await {
-                                    app.weather =
-                                        get_weather(url).await.map_err(|e| e.to_string())?.current;
-                                } else {
-                                    return Err("Unable to get Api url".to_string());
+                                    if let Ok(weather) = get_weather(url).await {
+                                        app.weather = Some(weather.current.unwrap());
+                                    } else {
+                                        app.weather = None;
+                                    }
                                 }
                             }
                             None => {}

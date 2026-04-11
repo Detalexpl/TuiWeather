@@ -262,14 +262,25 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg));
     let mut main: Paragraph;
-    let mut main_chunks_secondary = Layout::default().direction(Vertical).constraints([Constraint::Fill(1),Constraint::Length(1),Constraint::Fill(1)]).split(main_chunks[0].clone());
+    let mut main_chunks_secondary = Layout::default()
+        .direction(Vertical)
+        .constraints([
+            Constraint::Fill(1),
+            Constraint::Length(1),
+            Constraint::Fill(1),
+        ])
+        .split(main_chunks[0].clone());
     if let Some(weather) = app.weather.clone() {
         main_chunks_secondary = Layout::default()
             .direction(Vertical)
-            .constraints([Constraint::Fill(1), Constraint::Length(7),Constraint::Fill(1)])
+            .constraints([
+                Constraint::Fill(1),
+                Constraint::Length(7),
+                Constraint::Fill(1),
+            ])
             .split(main_chunks[0].clone());
         let temp = weather.temperature_2m.to_string();
-        let rain = (weather.rain+ weather.showers).to_string();
+        let rain = (weather.rain + weather.showers).to_string();
         let snow = weather.snowfall.to_string();
         let cloud_cover = weather.cloud_cover.to_string();
         let surface_presser = weather.surface_pressure.to_string();
@@ -298,31 +309,29 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                 "cloud cover: ".fg(colors.fg),
                 cloud_cover.fg(colors.fg),
                 "%".fg(colors.fg),
-
             ])
             .centered(),
             Line::from(vec![
                 "surface pressure: ".fg(colors.fg),
                 surface_presser.fg(colors.fg),
-                "hPa".fg(colors.fg)
+                "hPa".fg(colors.fg),
             ])
-                .centered(),
+            .centered(),
             Line::from(vec![
                 "sea level pressure ".fg(colors.fg),
                 pressure_msl.fg(colors.fg),
-                "hPa".fg(colors.fg)
-
+                "hPa".fg(colors.fg),
             ])
-                .centered(),
+            .centered(),
             Line::from(vec![
                 "relative humidity: ".fg(colors.fg),
                 relative_humidity.fg(colors.fg),
-                "%".fg(colors.fg)
+                "%".fg(colors.fg),
             ])
-                .centered()
+            .centered(),
         ];
-        main = Paragraph::new(Text::from(lines))
-            .style(Style::default().fg(colors.fg).bg(colors.bg));
+        main =
+            Paragraph::new(Text::from(lines)).style(Style::default().fg(colors.fg).bg(colors.bg));
     } else {
         main = Paragraph::new(Line::from(vec!["No Weather data".into()]).centered())
             .style(Style::default().fg(colors.fg).bg(colors.bg));
