@@ -10,6 +10,7 @@ use ratatui::style::{Color, Style, Styled};
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph, Tabs};
 
+
 struct ColorPalette {
     bg: Color,
     fg: Color,
@@ -173,6 +174,10 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .direction(Vertical)
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(main_chunks[1]);
+    let wind_speed_chunks = Layout::default()
+        .direction(Vertical)
+        .constraints([Constraint::Fill(1), Constraint::Length(1), Constraint::Fill(1)])
+        .split(main_vertical_chunks[0]);
     let footer_chunks = Layout::default()
         .direction(Horizontal)
         .constraints([
@@ -350,18 +355,46 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             .into_centered_line(),
     ))
     .block(last_char_block);
-    let mut wind_spd = String::new();
-    let mut wind_dir = String::new();
+    // making wind informations
+    let mut wind_spd_str = String::new();
+    let mut wind_dir_str = String::new();
+    let mut wind_speed: Paragraph;
+    let mut wind_dir: Paragraph;
     if let Some(weather) = app.weather.clone() {
-        wind_dir = weather.wind_direction_10m.to_string();
-        wind_spd = weather.wind_speed_10m.to_string();
+        wind_dir_str = weather.wind_direction_10m.to_string();
+        wind_spd_str = weather.wind_speed_10m.to_string();
+        wind_speed = Paragraph::new(
+            Line::from(vec![
+                "wind speed: ".fg(colors.fg),
+                wind_spd_str.fg(colors.fg),
+                unit_symbols.wind_speed.clone().fg(colors.fg),
+            ])
+                .centered(),
+        );
+        wind_dir = Paragraph::new(
+            Line::from(vec![
+                "wind dir: ".fg(colors.fg),
+                wind_dir_str.fg(colors.fg),
+                "°".fg(colors.fg),
+            ])
+                .centered(),
+        )
+            .block(wind_direction_block);
+    }else {
+        wind_speed = Paragraph::new(
+            Line::from(vec![
+                "No Weather data".fg(colors.fg),
+            ])
+                .centered()
+        );
+        wind_dir = Paragraph::new(
+            Line::from(vec![
+                "No Weather data".fg(colors.fg),
+            ])
+                .centered()
+        )
+            .block(wind_direction_block);
     }
-    let wind_direction = Paragraph::new(Text::from(format!("wind direction: {}", wind_dir)))
-        .style(Style::default().fg(colors.fg))
-        .block(wind_direction_block);
-    let wind_spd = Paragraph::new(Text::from(format!("wind speed: {}", wind_spd)))
-        .style(Style::default().fg(colors.fg))
-        .block(wind_block);
     // help info here
     match app.mode {
         Mode::Normal => {
@@ -434,10 +467,11 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         }
     }
     // some rendering
+    frame.render_widget(wind_block, main_vertical_chunks[0]);
     frame.render_widget(main_block, main_chunks[0]);
     frame.render_widget(main, main_chunks_secondary[1]);
-    frame.render_widget(wind_spd, main_vertical_chunks[0]);
-    frame.render_widget(wind_direction, main_vertical_chunks[1]);
+    frame.render_widget(wind_speed, wind_speed_chunks[1]);
+    frame.render_widget(wind_dir, main_vertical_chunks[1]);
     frame.render_widget(last_char, footer_chunks[2]);
     frame.render_widget(time, footer_chunks[0]);
     // popups go here
