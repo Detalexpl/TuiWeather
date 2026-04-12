@@ -6,7 +6,7 @@ use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::prelude::Stylize;
-use ratatui::style::{Color, Style, Styled};
+use ratatui::style::{Color, Style};
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph, Tabs};
 
@@ -109,9 +109,9 @@ struct UnitsSymbols {
 }
 impl UnitsSymbols {
     pub fn get_units(app: &AppState) -> UnitsSymbols {
-        let mut temperature = String::new();
-        let mut wind_speed = String::new();
-        let mut precipitation = String::new();
+        let temperature:String;
+        let wind_speed:String;
+        let precipitation:String;
         match app.units.temperature {
             TemperatureUnits::Celsius => {
                 temperature = String::from("°C");
@@ -266,7 +266,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title("Wind")
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg));
-    let mut main: Paragraph;
+    let main: Paragraph;
     let mut main_chunks_secondary = Layout::default()
         .direction(Vertical)
         .constraints([
@@ -356,10 +356,10 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     ))
     .block(last_char_block);
     // making wind informations
-    let mut wind_spd_str = String::new();
-    let mut wind_dir_str = String::new();
-    let mut wind_speed: Paragraph;
-    let mut wind_dir: Paragraph;
+    let wind_spd_str:String;
+    let wind_dir_str:String;
+    let wind_speed: Paragraph;
+    let wind_dir: Paragraph;
     if let Some(weather) = app.weather.clone() {
         wind_dir_str = weather.wind_direction_10m.to_string();
         wind_spd_str = weather.wind_speed_10m.to_string();
