@@ -681,17 +681,19 @@ fn render_arrow(frame:&mut  Frame, area: Rect, heading:u16){
     let p1:Point;
     let p2:Point;
     let p3:Point;
-    let p4:Point;
     //if heading <= 315 || heading >= 45 {
-        p1 = Point::new(3200.0,4500.0);
-        p3 = Point::new(3200.0,0.0);
+        p1 = Point::new(3200.0,4000.0);
+        p2 = Point::new(2560.0,500.0);
+        p3 = Point::new(3840.0,500.0);
     //}
     let canvas = Canvas::default()
         .x_bounds([0.0,6400.0])
         .y_bounds([0.0,4500.0])
         .marker(Marker::Braille)
         .paint(|ctx| {
-            ctx.draw(&CanLine::new(p1.x, p3.x, p1.y, p3.y, Color::Blue));
+            ctx.draw(&CanLine::new(p1.x,p1.y,p2.x,p2.y, Color::Black));
+            ctx.draw(&CanLine::new(p2.x,p2.y,p3.x,p3.y, Color::Red));
+            ctx.draw(&CanLine::new(p3.x,p3.y,p1.x,p1.y, Color::White));
         });
     frame.render_widget(canvas, area);
 }
