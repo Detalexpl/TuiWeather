@@ -7,9 +7,21 @@ use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::prelude::Stylize;
 use ratatui::style::{Color, Style};
+use ratatui::symbols::Marker;
 use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph, Tabs};
+use ratatui::widgets::canvas::Canvas;
+use ratatui::widgets::canvas::Line as CanLine;
 
+struct Point{
+    x: f64,
+    y: f64,
+}
+impl Point {
+    fn new(x: f64, y: f64) -> Self {
+        Self{x, y}
+    }
+}
 
 struct ColorPalette {
     bg: Color,
@@ -467,6 +479,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         }
     }
     // some rendering
+    render_arrow(frame,main_vertical_chunks[1],0);
     frame.render_widget(wind_block, main_vertical_chunks[0]);
     frame.render_widget(main_block, main_chunks[0]);
     frame.render_widget(main, main_chunks_secondary[1]);
@@ -663,4 +676,22 @@ fn unselected_block(title: &str) -> Block<'_> {
         .borders(Borders::ALL)
         .border_type(BorderType::LightTripleDashed)
         .style(Style::default().bg(Color::Black))
+}
+fn render_arrow(frame:&mut  Frame, area: Rect, heading:u16){
+    let p1:Point;
+    let p2:Point;
+    let p3:Point;
+    let p4:Point;
+    //if heading <= 315 || heading >= 45 {
+        p1 = Point::new(3200.0,4500.0);
+        p3 = Point::new(3200.0,0.0);
+    //}
+    let canvas = Canvas::default()
+        .x_bounds([0.0,6400.0])
+        .y_bounds([0.0,4500.0])
+        .marker(Marker::Braille)
+        .paint(|ctx| {
+            ctx.draw(&CanLine::new(p1.x, p3.x, p1.y, p3.y, Color::Blue));
+        });
+    frame.render_widget(canvas, area);
 }
