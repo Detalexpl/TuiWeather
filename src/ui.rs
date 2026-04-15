@@ -279,6 +279,15 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .title_alignment(Alignment::Center)
         .style(Style::default().bg(colors.bg).fg(colors.fg));
     let main: Paragraph;
+    let mut wind_dir_chunks = Layout::default()
+        .direction(Vertical)
+        .constraints([
+            Constraint::Fill(1),
+            Constraint::Length(1),
+            Constraint::Fill(1),
+
+        ])
+        .split(main_vertical_chunks[1].clone());
     let mut main_chunks_secondary = Layout::default()
         .direction(Vertical)
         .constraints([
@@ -407,6 +416,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         )
             .block(wind_direction_block);
     }
+
     // help info here
     match app.mode {
         Mode::Normal => {
@@ -479,12 +489,12 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         }
     }
     // some rendering
-    render_arrow(frame,main_vertical_chunks[1],0);
+    render_arrow(frame,main_vertical_chunks[1],200);
     frame.render_widget(wind_block, main_vertical_chunks[0]);
     frame.render_widget(main_block, main_chunks[0]);
     frame.render_widget(main, main_chunks_secondary[1]);
     frame.render_widget(wind_speed, wind_speed_chunks[1]);
-    frame.render_widget(wind_dir, main_vertical_chunks[1]);
+    frame.render_widget(wind_dir, wind_dir_chunks[1]);
     frame.render_widget(last_char, footer_chunks[2]);
     frame.render_widget(time, footer_chunks[0]);
     // popups go here
@@ -681,11 +691,24 @@ fn render_arrow(frame:&mut  Frame, area: Rect, heading:u16){
     let p1:Point;
     let p2:Point;
     let p3:Point;
-    //if heading <= 315 || heading >= 45 {
-        p1 = Point::new(3200.0,4000.0);
-        p2 = Point::new(2560.0,500.0);
-        p3 = Point::new(3840.0,500.0);
-    //}
+    if heading >= 315 || heading <= 45 {
+        p1 = Point::new(3200.0,4050.0);
+        p2 = Point::new(2560.0,450.0);
+        p3 = Point::new(3840.0,450.0);
+    }else if heading >= 45 && heading <= 135 {
+        p1 = Point::new(5760.0,2250.0);
+        p2 = Point::new(640.0,2700.0);
+        p3 = Point::new(640.0,1800.0);
+    }else if heading >= 135 && heading <= 225 {
+        p1 = Point::new(3200.0,450.0);
+        p2 = Point::new(2560.0,4050.0);
+        p3 = Point::new(3840.0,4050.0);
+    }else {
+        p1 = Point::new(640.0,2250.0);
+        p2 = Point::new(5760.0,2700.0);
+        p3 = Point::new(5760.0,1800.0);
+    }
+
     let canvas = Canvas::default()
         .x_bounds([0.0,6400.0])
         .y_bounds([0.0,4500.0])
