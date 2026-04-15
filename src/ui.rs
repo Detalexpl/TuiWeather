@@ -399,8 +399,8 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                 "°".fg(colors.fg),
             ])
                 .centered(),
-        )
-            .block(wind_direction_block);
+        );
+
     }else {
         wind_speed = Paragraph::new(
             Line::from(vec![
@@ -413,8 +413,8 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                 "No Weather data".fg(colors.fg),
             ])
                 .centered()
-        )
-            .block(wind_direction_block);
+        );
+
     }
 
     // help info here
@@ -489,7 +489,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         }
     }
     // some rendering
-    render_arrow(frame,main_vertical_chunks[1],200);
+    frame.render_widget(wind_direction_block, main_vertical_chunks[1]);
     frame.render_widget(wind_block, main_vertical_chunks[0]);
     frame.render_widget(main_block, main_chunks[0]);
     frame.render_widget(main, main_chunks_secondary[1]);
@@ -497,6 +497,10 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     frame.render_widget(wind_dir, wind_dir_chunks[1]);
     frame.render_widget(last_char, footer_chunks[2]);
     frame.render_widget(time, footer_chunks[0]);
+    if let Some(weather) = app.weather.clone() {
+        render_arrow(frame,main_vertical_chunks[1],weather.wind_direction_10m);
+    }
+
     // popups go here
     match app.mode {
         Mode::Typing => {
@@ -628,7 +632,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                     let wind_speed_tab = Tabs::new(["Knots", "km/h", "m/s", "mph"])
                         .select(wind_speed_tab_n)
                         .block(second_block)
-                        .padding("  ", "  ")
+                        .padding("  ", " 800 ")
                         .highlight_style(Style::default().magenta().on_black().bold());
                     let precipitation_tab = Tabs::new(["Millimeter", "Inch"])
                         .select(precipitation_tab_n)
@@ -692,26 +696,26 @@ fn render_arrow(frame:&mut  Frame, area: Rect, heading:u16){
     let p2:Point;
     let p3:Point;
     if heading >= 315 || heading <= 45 {
-        p1 = Point::new(3200.0,4050.0);
-        p2 = Point::new(2560.0,450.0);
-        p3 = Point::new(3840.0,450.0);
+        p1 = Point::new(3200.0,5760.0);
+        p2 = Point::new(2560.0,640.0);
+        p3 = Point::new(3840.0,640.0);
     }else if heading >= 45 && heading <= 135 {
-        p1 = Point::new(5760.0,2250.0);
-        p2 = Point::new(640.0,2700.0);
-        p3 = Point::new(640.0,1800.0);
+        p1 = Point::new(5760.0,3200.0);
+        p2 = Point::new(640.0,3840.0);
+        p3 = Point::new(640.0,2560.0);
     }else if heading >= 135 && heading <= 225 {
-        p1 = Point::new(3200.0,450.0);
-        p2 = Point::new(2560.0,4050.0);
-        p3 = Point::new(3840.0,4050.0);
+        p1 = Point::new(3200.0,640.0);
+        p2 = Point::new(2560.0,5760.0);
+        p3 = Point::new(3840.0,5760.0);
     }else {
-        p1 = Point::new(640.0,2250.0);
-        p2 = Point::new(5760.0,2700.0);
-        p3 = Point::new(5760.0,1800.0);
+        p1 = Point::new(640.0,3200.0);
+        p2 = Point::new(5760.0,3840.0);
+        p3 = Point::new(5760.0,2560.0);
     }
 
     let canvas = Canvas::default()
         .x_bounds([0.0,6400.0])
-        .y_bounds([0.0,4500.0])
+        .y_bounds([0.0,6400.0])
         .marker(Marker::Braille)
         .paint(|ctx| {
             ctx.draw(&CanLine::new(p1.x,p1.y,p2.x,p2.y, Color::Black));
