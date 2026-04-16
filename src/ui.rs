@@ -23,6 +23,30 @@ impl Point {
     }
 }
 
+struct TrianglePoints{
+    p1: Point,
+    p2: Point,
+    p3: Point,
+}
+impl TrianglePoints{
+    fn from_heading(heading: u16) -> TrianglePoints{
+        let angle:f64 = (90.0 - heading as f64)%360.0;
+        let p1x = 3200.0 + (2560.0 * angle.to_radians().cos());
+        let p1y = 3200.0 + (2560.0 * angle.to_radians().sin());
+        let px = 3200.0 - (2560.0 * angle.to_radians().cos());
+        let py = 3200.0 - (2560.0 * angle.to_radians().sin());
+        let p2x = px + (640.0 * (angle + 90.0).to_radians().cos());
+        let p2y = py + (640.0 * (angle + 90.0).to_radians().sin());
+        let p3x = px + (640.0 * (angle - 90.0).to_radians().cos());
+        let p3y = py + (640.0 * (angle - 90.0).to_radians().sin());
+        let p1 = Point::new(p1x, p1y);
+        let p2 = Point::new(p2x, p2y);
+        let p3 = Point::new(p3x, p3y);
+        TrianglePoints{p1, p2, p3}
+
+
+    }
+}
 struct ColorPalette {
     bg: Color,
     fg: Color,
@@ -699,26 +723,6 @@ fn unselected_block(title: &str) -> Block<'_> {
         .style(Style::default().bg(Color::Black))
 }
 fn render_arrow(frame:&mut  Frame, area: Rect,color_palette: &ColorPalette ,heading:u16){
-    let p1:Point;
-    let p2:Point;
-    let p3:Point;
-    if heading >= 315 || heading <= 45 {
-        p1 = Point::new(3200.0,5760.0);
-        p2 = Point::new(2560.0,640.0);
-        p3 = Point::new(3840.0,640.0);
-    }else if heading >= 45 && heading <= 135 {
-        p1 = Point::new(5760.0,3200.0);
-        p2 = Point::new(640.0,3840.0);
-        p3 = Point::new(640.0,2560.0);
-    }else if heading >= 135 && heading <= 225 {
-        p1 = Point::new(3200.0,640.0);
-        p2 = Point::new(2560.0,5760.0);
-        p3 = Point::new(3840.0,5760.0);
-    }else {
-        p1 = Point::new(640.0,3200.0);
-        p2 = Point::new(5760.0,3840.0);
-        p3 = Point::new(5760.0,2560.0);
-    }
     let canvas_block = Block::default().borders(Borders::NONE).style(Style::default().fg(color_palette.fg).bg(color_palette.bg));
 
     let canvas = Canvas::default()
@@ -726,9 +730,11 @@ fn render_arrow(frame:&mut  Frame, area: Rect,color_palette: &ColorPalette ,head
         .y_bounds([0.0,6400.0])
         .marker(Marker::Braille)
         .paint(|ctx| {
-            ctx.draw(&CanLine::new(p1.x,p1.y,p2.x,p2.y, Color::Black));
-            ctx.draw(&CanLine::new(p2.x,p2.y,p3.x,p3.y, Color::Red));
-            ctx.draw(&CanLine::new(p3.x,p3.y,p1.x,p1.y, Color::White));
+            let triangle = TrianglePoints::from_heading(heading);
+
+            ctx.draw(&CanLine::new(triangle.p1.x,triangle.p1.y,triangle.p2.x,triangle.p2.y, Color::Black));
+            ctx.draw(&CanLine::new(triangle.p2.x,triangle.p2.y,triangle.p3.x,triangle.p3.y, Color::Red));
+            ctx.draw(&CanLine::new(triangle.p3.x,triangle.p3.y,triangle.p1.x,triangle.p1.y, Color::White));
         });
     frame.render_widget(canvas, into_square(area));
     frame.render_widget(canvas_block, area);
@@ -752,5 +758,4 @@ fn into_square(area: Rect) -> Rect {
         y = area.y;
     }
     Rect { x,y,width,height }
-
 }
