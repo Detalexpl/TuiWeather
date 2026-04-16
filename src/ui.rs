@@ -382,6 +382,13 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     let wind_speed: Paragraph;
     let wind_dir: Paragraph;
     if let Some(weather) = app.weather.clone() {
+        wind_dir_chunks = Layout::default()
+            .direction(Vertical)
+            .constraints([
+                Constraint::Fill(1),
+                Constraint::Length(2)
+            ])
+            .split(main_vertical_chunks[1].clone());
         wind_dir_str = weather.wind_direction_10m.to_string();
         wind_spd_str = weather.wind_speed_10m.to_string();
         wind_speed = Paragraph::new(
@@ -498,7 +505,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     frame.render_widget(last_char, footer_chunks[2]);
     frame.render_widget(time, footer_chunks[0]);
     if let Some(weather) = app.weather.clone() {
-        render_arrow(frame,main_vertical_chunks[1],weather.wind_direction_10m);
+        render_arrow(frame,wind_dir_chunks[0],&colors,weather.wind_direction_10m);
     }
 
     // popups go here
@@ -691,7 +698,7 @@ fn unselected_block(title: &str) -> Block<'_> {
         .border_type(BorderType::LightTripleDashed)
         .style(Style::default().bg(Color::Black))
 }
-fn render_arrow(frame:&mut  Frame, area: Rect, heading:u16){
+fn render_arrow(frame:&mut  Frame, area: Rect,color_palette: &ColorPalette ,heading:u16){
     let p1:Point;
     let p2:Point;
     let p3:Point;
@@ -712,6 +719,7 @@ fn render_arrow(frame:&mut  Frame, area: Rect, heading:u16){
         p2 = Point::new(5760.0,3840.0);
         p3 = Point::new(5760.0,2560.0);
     }
+    let canvas_block = Block::default().borders(Borders::NONE).style(Style::default().fg(color_palette.fg).bg(color_palette.bg));
 
     let canvas = Canvas::default()
         .x_bounds([0.0,6400.0])
@@ -722,5 +730,27 @@ fn render_arrow(frame:&mut  Frame, area: Rect, heading:u16){
             ctx.draw(&CanLine::new(p2.x,p2.y,p3.x,p3.y, Color::Red));
             ctx.draw(&CanLine::new(p3.x,p3.y,p1.x,p1.y, Color::White));
         });
-    frame.render_widget(canvas, area);
+    frame.render_widget(canvas, into_square(area));
+    frame.render_widget(canvas_block, area);
+
+
+}
+fn into_square(area: Rect) -> Rect {
+    let x:u16;
+    let y:u16;
+    let width:u16;
+    let height:u16;
+    if area.height > (area.width*2){
+        height = area.width/2;
+        width = area.width;
+        y = area.y + ((area.height - height) / 2);
+        x = area.x;
+    }else {
+        width = area.height*2;
+        height = area.height;
+        x= area.x+((area.width - width) / 2) ;
+        y = area.y;
+    }
+    Rect { x,y,width,height }
+
 }
