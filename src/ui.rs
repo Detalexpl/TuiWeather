@@ -9,28 +9,28 @@ use ratatui::prelude::Stylize;
 use ratatui::style::{Color, Style};
 use ratatui::symbols::Marker;
 use ratatui::text::{Line, Span, Text};
-use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph, Tabs};
 use ratatui::widgets::canvas::Canvas;
 use ratatui::widgets::canvas::Line as CanLine;
+use ratatui::widgets::{Block, BorderType, Borders, Clear, List, ListItem, Paragraph, Tabs};
 
-struct Point{
+struct Point {
     x: f64,
     y: f64,
 }
 impl Point {
     fn new(x: f64, y: f64) -> Self {
-        Self{x, y}
+        Self { x, y }
     }
 }
 
-struct TrianglePoints{
+struct TrianglePoints {
     p1: Point,
     p2: Point,
     p3: Point,
 }
-impl TrianglePoints{
-    fn from_heading(heading: u16) -> TrianglePoints{
-        let angle:f64 = (90.0 - heading as f64)%360.0;
+impl TrianglePoints {
+    fn from_heading(heading: u16) -> TrianglePoints {
+        let angle: f64 = (90.0 - heading as f64) % 360.0;
         let p1x = 3200.0 + (2560.0 * angle.to_radians().cos());
         let p1y = 3200.0 + (2560.0 * angle.to_radians().sin());
         let px = 3200.0 - (2560.0 * angle.to_radians().cos());
@@ -42,9 +42,7 @@ impl TrianglePoints{
         let p1 = Point::new(p1x, p1y);
         let p2 = Point::new(p2x, p2y);
         let p3 = Point::new(p3x, p3y);
-        TrianglePoints{p1, p2, p3}
-
-
+        TrianglePoints { p1, p2, p3 }
     }
 }
 struct ColorPalette {
@@ -56,51 +54,66 @@ impl ColorPalette {
         if let Some(weather) = &app.weather {
             if weather.weather_code == 0 {
                 ColorPalette {
-                    bg: Color::Blue,
-                    fg: Color::Yellow,
+                    //Azure
+                    bg: Color::Rgb(0, 127, 255),
+                    //lemon yellow
+                    fg: Color::Rgb(255, 254, 79),
                 }
             } else if weather.weather_code == 1
                 || weather.weather_code == 2
                 || weather.weather_code == 3
             {
                 ColorPalette {
-                    bg: Color::LightBlue,
-                    fg: Color::Yellow,
+                    // steel blue
+                    bg: Color::Rgb(70, 130, 180),
+                    // pastel yellow
+                    fg: Color::Rgb(253, 253, 150),
                 }
             } else if weather.weather_code == 45 || weather.weather_code == 48 {
                 ColorPalette {
-                    bg: Color::Gray,
-                    fg: Color::Black,
+                    //cloud gray
+                    bg: Color::Rgb(184, 190, 185),
+                    //onyx gray
+                    fg: Color::Rgb(53, 56, 57),
                 }
-            } else if weather.weather_code == 56 || weather.weather_code == 57 {
+            } else if weather.weather_code == 51
+                || weather.weather_code == 53
+                || weather.weather_code == 55
+                || weather.weather_code == 56
+                || weather.weather_code == 57
+            {
                 ColorPalette {
-                    bg: Color::Gray,
-                    fg: Color::LightBlue,
+                    // steel blue
+                    bg: Color::Rgb(184, 190, 185),
+                    //sapphire blue
+                    fg: Color::Rgb(15,82,186),
                 }
             } else if weather.weather_code == 61
                 || weather.weather_code == 63
                 || weather.weather_code == 65
+                ||  weather.weather_code == 66
+                || weather.weather_code == 67
             {
                 ColorPalette {
-                    bg: Color::Gray,
-                    fg: Color::LightBlue,
-                }
-            } else if weather.weather_code == 66 || weather.weather_code == 67 {
-                ColorPalette {
-                    bg: Color::DarkGray,
-                    fg: Color::Black,
+                    //Slate
+                    bg: Color::Rgb(109, 129, 150),
+                    //persian blue
+                    fg: Color::Rgb(28,57,187),
                 }
             } else if weather.weather_code == 71
                 || weather.weather_code == 73
                 || weather.weather_code == 75
             {
                 ColorPalette {
-                    bg: Color::Gray,
-                    fg: Color::LightCyan,
+                    //Slate
+                    bg: Color::Rgb(109, 129, 150),
+                    //Light Cyan
+                    fg: Color::Rgb(224,255,255),
                 }
             } else if weather.weather_code == 77 {
                 ColorPalette {
-                    bg: Color::DarkGray,
+                    //dARk GRAY
+                    bg: Color::Rgb(107, 107, 109),
                     fg: Color::White,
                 }
             } else if weather.weather_code == 80
@@ -145,9 +158,9 @@ struct UnitsSymbols {
 }
 impl UnitsSymbols {
     pub fn get_units(app: &AppState) -> UnitsSymbols {
-        let temperature:String;
-        let wind_speed:String;
-        let precipitation:String;
+        let temperature: String;
+        let wind_speed: String;
+        let precipitation: String;
         match app.units.temperature {
             TemperatureUnits::Celsius => {
                 temperature = String::from("°C");
@@ -212,7 +225,11 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
         .split(main_chunks[1]);
     let wind_speed_chunks = Layout::default()
         .direction(Vertical)
-        .constraints([Constraint::Fill(1), Constraint::Length(1), Constraint::Fill(1)])
+        .constraints([
+            Constraint::Fill(1),
+            Constraint::Length(1),
+            Constraint::Fill(1),
+        ])
         .split(main_vertical_chunks[0]);
     let footer_chunks = Layout::default()
         .direction(Horizontal)
@@ -309,7 +326,6 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             Constraint::Fill(1),
             Constraint::Length(1),
             Constraint::Fill(1),
-
         ])
         .split(main_vertical_chunks[1].clone());
     let mut main_chunks_secondary = Layout::default()
@@ -401,17 +417,14 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     ))
     .block(last_char_block);
     // making wind informations
-    let wind_spd_str:String;
-    let wind_dir_str:String;
+    let wind_spd_str: String;
+    let wind_dir_str: String;
     let wind_speed: Paragraph;
     let wind_dir: Paragraph;
     if let Some(weather) = app.weather.clone() {
         wind_dir_chunks = Layout::default()
             .direction(Vertical)
-            .constraints([
-                Constraint::Fill(1),
-                Constraint::Length(2)
-            ])
+            .constraints([Constraint::Fill(1), Constraint::Length(2)])
             .split(main_vertical_chunks[1].clone());
         wind_dir_str = weather.wind_direction_10m.to_string();
         wind_spd_str = weather.wind_speed_10m.to_string();
@@ -421,7 +434,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                 wind_spd_str.fg(colors.fg),
                 unit_symbols.wind_speed.clone().fg(colors.fg),
             ])
-                .centered(),
+            .centered(),
         );
         wind_dir = Paragraph::new(
             Line::from(vec![
@@ -429,23 +442,11 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
                 wind_dir_str.fg(colors.fg),
                 "°".fg(colors.fg),
             ])
-                .centered(),
+            .centered(),
         );
-
-    }else {
-        wind_speed = Paragraph::new(
-            Line::from(vec![
-                "No Weather data".fg(colors.fg),
-            ])
-                .centered()
-        );
-        wind_dir = Paragraph::new(
-            Line::from(vec![
-                "No Weather data".fg(colors.fg),
-            ])
-                .centered()
-        );
-
+    } else {
+        wind_speed = Paragraph::new(Line::from(vec!["No Weather data".fg(colors.fg)]).centered());
+        wind_dir = Paragraph::new(Line::from(vec!["No Weather data".fg(colors.fg)]).centered());
     }
 
     // help info here
@@ -529,7 +530,12 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
     frame.render_widget(last_char, footer_chunks[2]);
     frame.render_widget(time, footer_chunks[0]);
     if let Some(weather) = app.weather.clone() {
-        render_arrow(frame,wind_dir_chunks[0],&colors,weather.wind_direction_10m);
+        render_arrow(
+            frame,
+            wind_dir_chunks[0],
+            &colors,
+            weather.wind_direction_10m,
+        );
     }
 
     // popups go here
@@ -722,40 +728,63 @@ fn unselected_block(title: &str) -> Block<'_> {
         .border_type(BorderType::LightTripleDashed)
         .style(Style::default().bg(Color::Black))
 }
-fn render_arrow(frame:&mut  Frame, area: Rect,color_palette: &ColorPalette ,heading:u16){
-    let canvas_block = Block::default().borders(Borders::NONE).style(Style::default().fg(color_palette.fg).bg(color_palette.bg));
+fn render_arrow(frame: &mut Frame, area: Rect, color_palette: &ColorPalette, heading: u16) {
+    let canvas_block = Block::default()
+        .borders(Borders::NONE)
+        .style(Style::default().fg(color_palette.fg).bg(color_palette.bg));
 
     let canvas = Canvas::default()
-        .x_bounds([0.0,6400.0])
-        .y_bounds([0.0,6400.0])
+        .x_bounds([0.0, 6400.0])
+        .y_bounds([0.0, 6400.0])
         .marker(Marker::Braille)
         .paint(|ctx| {
             let triangle = TrianglePoints::from_heading(heading);
 
-            ctx.draw(&CanLine::new(triangle.p1.x,triangle.p1.y,triangle.p2.x,triangle.p2.y, Color::Black));
-            ctx.draw(&CanLine::new(triangle.p2.x,triangle.p2.y,triangle.p3.x,triangle.p3.y, Color::Red));
-            ctx.draw(&CanLine::new(triangle.p3.x,triangle.p3.y,triangle.p1.x,triangle.p1.y, Color::White));
+            ctx.draw(&CanLine::new(
+                triangle.p1.x,
+                triangle.p1.y,
+                triangle.p2.x,
+                triangle.p2.y,
+                Color::Black,
+            ));
+            ctx.draw(&CanLine::new(
+                triangle.p2.x,
+                triangle.p2.y,
+                triangle.p3.x,
+                triangle.p3.y,
+                Color::Red,
+            ));
+            ctx.draw(&CanLine::new(
+                triangle.p3.x,
+                triangle.p3.y,
+                triangle.p1.x,
+                triangle.p1.y,
+                Color::White,
+            ));
         });
     frame.render_widget(canvas, into_square(area));
     frame.render_widget(canvas_block, area);
-
-
 }
 fn into_square(area: Rect) -> Rect {
-    let x:u16;
-    let y:u16;
-    let width:u16;
-    let height:u16;
-    if area.height > (area.width*2){
-        height = area.width/2;
+    let x: u16;
+    let y: u16;
+    let width: u16;
+    let height: u16;
+    if area.height > (area.width * 2) {
+        height = area.width / 2;
         width = area.width;
         y = area.y + ((area.height - height) / 2);
         x = area.x;
-    }else {
-        width = area.height*2;
+    } else {
+        width = area.height * 2;
         height = area.height;
-        x= area.x+((area.width - width) / 2) ;
+        x = area.x + ((area.width - width) / 2);
         y = area.y;
     }
-    Rect { x,y,width,height }
+    Rect {
+        x,
+        y,
+        width,
+        height,
+    }
 }
