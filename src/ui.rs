@@ -267,17 +267,17 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             if percentage >= &40.0 {
                 batteries.push(ListItem::new(Line::from(Span::styled(
                     format!("Battery: {:.0}%", percentage),
-                    Style::default().fg(Color::Green),
+                    Style::default().fg(Color::Rgb(141, 182, 0)),
                 ))));
             } else if percentage > &15.0 {
                 batteries.push(ListItem::new(Line::from(Span::styled(
                     format!("Battery: {:.0}%", percentage),
-                    Style::default().fg(Color::Yellow),
+                    Style::default().fg(Color::Rgb(255, 112, 0)),
                 ))));
             } else {
                 batteries.push(ListItem::new(Line::from(Span::styled(
                     format!("Battery: {:.0}%", percentage),
-                    Style::default().fg(Color::Red),
+                    Style::default().fg(Color::Rgb(255, 8, 0)),
                 ))))
             }
         }
@@ -492,10 +492,13 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
         Mode::Exiting => {
-            let cheat_sheet = Paragraph::new(Line::from(Span::styled(
-                "Follow instructions on popup",
-                Style::default().fg(colors.fg).bg(colors.bg),
-            )))
+            let cheat_sheet = Paragraph::new(Line::from(
+                Span::styled(
+                    "Follow instructions on popup",
+                    Style::default().fg(colors.fg).bg(colors.bg),
+                )
+                .into_centered_line(),
+            ))
             .block(cheat_sheet_block);
             frame.render_widget(cheat_sheet, footer_chunks[1]);
         }
@@ -691,6 +694,33 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             }
         }
         _ => {}
+    }
+}
+pub fn to_small_frame(frame: &mut Frame) {
+    let layout = Layout::default()
+        .direction(Vertical)
+        .constraints([
+            Constraint::Fill(1),
+            Constraint::Length(1),
+            Constraint::Fill(1),
+        ])
+        .split(frame.area());
+    let block = Block::default()
+        .borders(Borders::ALL)
+        .border_type(BorderType::Rounded)
+        .style(Style::default());
+    if frame.area().height < 37 && frame.area().width > 136 {
+        let msg = Line::from(vec!["window height is too small".into()]).centered();
+        frame.render_widget(block, frame.area());
+        frame.render_widget(msg, layout[1]);
+    } else if frame.area().width < 136 && frame.area().height > 37 {
+        let msg = Line::from(vec!["window width is too small".into()]).centered();
+        frame.render_widget(block, frame.area());
+        frame.render_widget(msg, layout[1]);
+    } else {
+        let msg = Line::from("window is too small").centered();
+        frame.render_widget(block, frame.area());
+        frame.render_widget(msg, layout[1]);
     }
 }
 //popup Rect generator (this week warning is ment to be there )
