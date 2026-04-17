@@ -86,19 +86,19 @@ impl ColorPalette {
                     // steel blue
                     bg: Color::Rgb(184, 190, 185),
                     //sapphire blue
-                    fg: Color::Rgb(15,82,186),
+                    fg: Color::Rgb(15, 82, 186),
                 }
             } else if weather.weather_code == 61
                 || weather.weather_code == 63
                 || weather.weather_code == 65
-                ||  weather.weather_code == 66
+                || weather.weather_code == 66
                 || weather.weather_code == 67
             {
                 ColorPalette {
                     //Slate
                     bg: Color::Rgb(109, 129, 150),
                     //persian blue
-                    fg: Color::Rgb(28,57,187),
+                    fg: Color::Rgb(28, 57, 187),
                 }
             } else if weather.weather_code == 71
                 || weather.weather_code == 73
@@ -108,7 +108,7 @@ impl ColorPalette {
                     //Slate
                     bg: Color::Rgb(109, 129, 150),
                     //Light Cyan
-                    fg: Color::Rgb(224,255,255),
+                    fg: Color::Rgb(224, 255, 255),
                 }
             } else if weather.weather_code == 77 {
                 ColorPalette {
