@@ -30,7 +30,7 @@ struct TrianglePoints {
 }
 impl TrianglePoints {
     fn from_heading(heading: u16) -> TrianglePoints {
-        let angle: f64 = (90.0 - heading as f64) % 360.0;
+        let angle: f64 = (270.0 - heading as f64) % 360.0;
         let p1x = 3200.0 + (2560.0 * angle.to_radians().cos());
         let p1y = 3200.0 + (2560.0 * angle.to_radians().sin());
         let px = 3200.0 - (2560.0 * angle.to_radians().cos());
@@ -114,28 +114,31 @@ impl ColorPalette {
                 ColorPalette {
                     //dARk GRAY
                     bg: Color::Rgb(107, 107, 109),
-                    fg: Color::White,
+                    fg: Color::Rgb(108, 160, 220),
                 }
             } else if weather.weather_code == 80
                 || weather.weather_code == 81
                 || weather.weather_code == 82
             {
                 ColorPalette {
-                    bg: Color::Gray,
-                    fg: Color::Blue,
+                    // onyx gray
+                    bg: Color::Rgb(53, 56, 57),
+                    //navy blue
+                    fg: Color::Rgb(0, 0, 128),
                 }
             } else if weather.weather_code == 85 || weather.weather_code == 86 {
                 ColorPalette {
-                    bg: Color::DarkGray,
-                    fg: Color::White,
+                    // onyx gray
+                    bg: Color::Rgb(53, 56, 57),
+                    fg: Color::Rgb(108, 160, 220),
                 }
             } else if weather.weather_code == 95
                 || weather.weather_code == 96
                 || weather.weather_code == 99
             {
                 ColorPalette {
-                    bg: Color::DarkGray,
-                    fg: Color::LightYellow,
+                    bg: Color::Rgb(2, 4, 3),
+                    fg: Color::Rgb(225, 212, 0),
                 }
             } else {
                 ColorPalette {
