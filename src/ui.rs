@@ -429,7 +429,7 @@ pub fn ui(frame: &mut Frame, app: &mut AppState) {
             .direction(Vertical)
             .constraints([Constraint::Fill(1), Constraint::Length(2)])
             .split(main_vertical_chunks[1].clone());
-        wind_dir_str = weather.wind_direction_10m.to_string();
+        wind_dir_str = ((weather.wind_direction_10m + 180) % 360).to_string();
         wind_spd_str = weather.wind_speed_10m.to_string();
         wind_speed = Paragraph::new(
             Line::from(vec![
