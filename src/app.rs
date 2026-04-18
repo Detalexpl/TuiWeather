@@ -123,13 +123,16 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                                     get_location(&path_to_cities, &app.location_input)
                                         .map_err(|_| "Unable to get location".to_string())?;
                                 if let Some(_) = &app.valid_location {
-                                    if let Ok(url) = get_url(&app).await {
-                                        if let Ok(weather) = get_weather(url).await {
-                                            app.weather = Some(weather.current.unwrap());
-                                        } else {
-                                            app.weather = None;
-                                        }
+                                    let url = get_url(&app)
+                                        .await
+                                        .map_err(|_| "Unable to get url".to_string())?;
+
+                                    if let Ok(weather) = get_weather(url).await{
+                                        app.weather = Some(weather.current.unwrap());
+                                    } else {
+                                        app.weather = None;
                                     }
+
                                     app.location = app.location_input.clone()
                                 }
                                 app.location_input.clear();
@@ -152,13 +155,13 @@ pub async fn run<B: Backend>(terminal: &mut Terminal<B>, app: &mut AppState) -> 
                     KeyCode::Char('r') => {
                         match &app.valid_location {
                             Some(_) => {
-                                if let Ok(url) = get_url(&app).await {
+                                let url= get_url(&app).await.map_err(|_| "Unable to get url".to_string())?;
                                     if let Ok(weather) = get_weather(url).await {
                                         app.weather = Some(weather.current.unwrap());
                                     } else {
                                         app.weather = None;
                                     }
-                                }
+
                             }
                             None => {}
                         }
