@@ -24,7 +24,7 @@ pub fn get_location(
     let mut rdr = csv::ReaderBuilder::new().from_path(path)?;
     for result in rdr.deserialize() {
         let record: Record = result?;
-        if record.city == query {
+        if record.city.to_lowercase() == query.to_lowercase() {
             return Ok(Some(Location {
                 latitude: record.lat,
                 longitude: record.lng,
