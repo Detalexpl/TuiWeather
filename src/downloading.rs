@@ -2,7 +2,7 @@ use directories::ProjectDirs;
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use tokio::fs::create_dir_all;
+use smol::fs::create_dir_all;
 
 //this function returns Path where dada shude be stored
 pub fn getting_path() -> Option<PathBuf> {

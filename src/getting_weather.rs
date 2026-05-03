@@ -95,7 +95,9 @@ pub async fn get_weather(url: String) -> Result<WeatherResponse, Box<dyn std::er
 mod tests {
     use super::*;
     use crate::getting_location::Location;
-    #[tokio::test]
+    use macro_rules_attribute::apply;
+    use smol_macros::{test};
+    #[apply(test!)]
     async fn get_url_test() {
         let mut app_state = AppState::new().unwrap();
         let location = Location {
